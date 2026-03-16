@@ -29,6 +29,7 @@
 
           <!-- Sélecteur d'enclos -->
           <div class="mt-3 flex items-center gap-2">
+            <img src="/icons/icon_enclos.webp" alt="Enclos" class="w-12 h-12 object-contain opacity-60" />
             <span class="text-blue-300/60 text-xs font-semibold uppercase tracking-widest mr-1">Enclos</span>
             <div class="flex items-center gap-1">
               <button

@@ -3,7 +3,7 @@
     <!-- Header -->
     <div class="flex items-center gap-3 mb-4">
       <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
-        <img src="/icons/icon_timer.webp" class="w-6 h-6 object-contain" />
+        <img src="/icons/icon_timer.webp" class="w-8 h-8 object-contain" />
       </div>
       <div>
         <h2 class="font-bold text-lg text-white leading-tight">Estimation</h2>

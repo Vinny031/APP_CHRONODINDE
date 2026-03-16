@@ -6,7 +6,7 @@
       <div class="flex items-center gap-3">
         <div class="relative">
           <div class="absolute inset-0 rounded-xl blur-md opacity-40" style="background: radial-gradient(circle, #e94560, transparent);" />
-          <img src="/icons/favicon.webp" alt="ChronoDinde" class="relative h-11 w-11 rounded-xl object-contain" />
+          <img src="/icons/favicon.webp" alt="ChronoDinde" class="relative h-16 w-16 rounded-xl object-contain" />
         </div>
         <div class="flex flex-col leading-none gap-1">
           <span class="font-extrabold text-xl tracking-tight text-white">Chrono<span style="color:#e94560">Dinde</span></span>
