@@ -54,53 +54,37 @@
         />
         <!-- Marqueurs de seuil -->
         <div class="absolute inset-0 flex pointer-events-none">
-          <div class="h-full border-r border-white/20" style="width: 40%" />
-          <div class="h-full border-r border-white/20" style="width: 30%" />
+          <div class="h-full border-r border-white/20" style="width: 20%" />
+          <div class="h-full border-r border-white/20" style="width: 20%" />
+          <div class="h-full border-r border-white/20" style="width: 20%" />
           <div class="h-full border-r border-white/20" style="width: 20%" />
         </div>
       </div>
-      <!-- Input slider -->
+      <!-- Paliers -->
+      <div class="flex gap-1 mt-2">
+        <button
+          v-for="palier in PALIERS"
+          :key="palier.v"
+          class="flex-1 rounded-lg py-1 text-xs font-bold transition-all duration-150"
+          :class="etat.valeurActuelle === palier.v
+            ? `${config.fillClass} text-white shadow-md`
+            : 'bg-white/10 text-white/50 hover:bg-white/20 hover:text-white/80'"
+          :aria-label="`Carburant ${palier.l}`"
+          @click="$emit('setValeur', jauge.id, palier.v)"
+        >{{ palier.l }}</button>
+      </div>
+      <!-- Input exact -->
       <input
-        type="range"
+        type="number"
         min="0"
         max="100000"
         step="1000"
         :value="etat.valeurActuelle"
-        :aria-label="`Carburant ${jauge.nom}`"
-        :aria-valuemin="0"
-        :aria-valuemax="100000"
-        :aria-valuenow="etat.valeurActuelle"
-        @input="onValeurInput"
-        class="w-full mt-2"
-        :style="{ accentColor: config.accentColor }"
+        :aria-label="`Carburant exact ${jauge.nom}`"
+        @change="onValeurChange"
+        class="w-full mt-1 bg-white/10 border border-white/10 rounded-lg px-2 py-1 text-center text-xs font-mono text-white/70 focus:outline-none focus:border-white/30 focus:text-white"
+        placeholder="valeur exacte"
       />
-      <!-- Input numérique -->
-      <div class="flex items-center gap-2 mt-1">
-        <button
-          class="w-7 h-7 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-bold transition-colors flex items-center justify-center"
-          :aria-label="`Diminuer carburant ${jauge.nom}`"
-          @click="$emit('setValeur', jauge.id, Math.max(0, etat.valeurActuelle - 5000))"
-        >
-          <i class="fa-solid fa-minus text-xs" aria-hidden="true" />
-        </button>
-        <input
-          type="number"
-          min="0"
-          max="100000"
-          step="1000"
-          :value="etat.valeurActuelle"
-          :aria-label="`Carburant ${jauge.nom}`"
-          @change="onValeurChange"
-          class="flex-1 bg-white/10 border border-white/10 rounded-lg px-2 py-1 text-center text-sm font-mono text-white focus:outline-none focus:border-white/30"
-        />
-        <button
-          class="w-7 h-7 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-bold transition-colors flex items-center justify-center"
-          :aria-label="`Augmenter carburant ${jauge.nom}`"
-          @click="$emit('setValeur', jauge.id, Math.min(100000, etat.valeurActuelle + 5000))"
-        >
-          <i class="fa-solid fa-plus text-xs" aria-hidden="true" />
-        </button>
-      </div>
     </div>
 
     <!-- Delta actuel -->
@@ -172,6 +156,13 @@
         >
           <i class="fa-solid fa-plus text-xs" aria-hidden="true" />
         </button>
+        <button
+          class="h-7 px-2 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-bold transition-colors text-white/70 hover:text-white"
+          :aria-label="`Mettre objectif ${jauge.nom} au maximum`"
+          @click="$emit('setObjectif', jauge.id, 100000)"
+        >
+          MAX
+        </button>
       </div>
     </div>
   </div>
@@ -199,6 +190,14 @@ const emit = defineEmits<{
 
 const config = computed(() => JAUGES_CONFIGS[props.jauge.id])
 
+const PALIERS = [
+  { v: 20000,  l: '20k'  },
+  { v: 40000,  l: '40k'  },
+  { v: 70000,  l: '70k'  },
+  { v: 90000,  l: '90k'  },
+  { v: 100000, l: 'MAX'  },
+]
+
 const pourcentage = computed(() => Math.round((props.etat.valeurActuelle / 100000) * 100))
 const pourcentageObjectif = computed(() => Math.round((props.etat.objectif / 100000) * 100))
 const valeurFormatted = computed(() => props.etat.valeurActuelle.toLocaleString('fr'))
@@ -213,11 +212,6 @@ const toggleClasses = computed(() => {
   }
   return 'border-white/20 text-white/50 hover:border-white/40 hover:text-white/70'
 })
-
-function onValeurInput(e: Event) {
-  const v = parseInt((e.target as HTMLInputElement).value, 10)
-  if (!isNaN(v)) emit('setValeur', props.jauge.id, v)
-}
 
 function onValeurChange(e: Event) {
   const v = parseInt((e.target as HTMLInputElement).value, 10)

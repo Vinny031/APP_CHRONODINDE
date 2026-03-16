@@ -6,7 +6,7 @@
   >
     <!-- Fond de la barre (le "tube") -->
     <div
-      class="absolute bottom-0"
+      class="absolute bottom-0 transition-all duration-150"
       :style="{
         width: barWidth + 'px',
         height: '100%',
@@ -15,7 +15,6 @@
         boxShadow: isActive ? config.glowShadow : 'none',
         cursor: 'pointer',
       }"
-      @click="onBarreClick"
     >
       <!-- Fill coloré depuis le bas -->
       <div
@@ -53,11 +52,10 @@
         :aria-valuenow="etat.valeurActuelle"
         @input="e => { emit('setValeur', parseInt((e.target as HTMLInputElement).value, 10)); dragging = true }"
         @change="dragging = false"
-        @mousedown="dragging = true"
+        @mousedown="dragging = true; emit('select')"
         @mouseup="dragging = false"
-        @touchstart="dragging = true"
+        @touchstart="dragging = true; emit('select')"
         @touchend="dragging = false"
-        @click.stop
         class="absolute inset-0 opacity-0 cursor-pointer"
         style="writing-mode: vertical-lr; direction: rtl; width: 100%; height: 100%; margin: 0; padding: 0; z-index: 4;"
       />
@@ -89,6 +87,7 @@ const props = defineProps<{
   etat: JaugeState
   isActive: boolean
   isMaxReached: boolean
+  isSelected?: boolean
   colWidth: number
   barWidth: number
   barreHeight: number
@@ -98,6 +97,7 @@ const emit = defineEmits<{
   toggle: []
   setValeur: [val: number]
   setObjectif: [val: number]
+  select: []
 }>()
 
 const config = computed(() => JAUGES_CONFIGS[props.jauge.id])
@@ -108,9 +108,4 @@ function pct(val: number) {
   return Math.max(0, Math.min(100, (val / 100000) * 100))
 }
 
-function onBarreClick(e: MouseEvent) {
-  const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
-  const ratio = 1 - ((e.clientY - rect.top) / rect.height)
-  emit('setValeur', Math.max(0, Math.min(100000, Math.round(ratio * 100000 / 1000) * 1000)))
-}
 </script>

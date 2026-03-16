@@ -45,10 +45,12 @@
               :jauge="j" :etat="etats[j.id]"
               :is-active="etats[j.id].enabled"
               :is-max-reached="jaugesActives.length >= MAX_ACTIVES"
+              :is-selected="jaugeSelectionnee === j.id"
               :col-width="COL" :bar-width="BAR_P" :barre-height="barreHeight"
               @toggle="$emit('toggle', j.id)"
               @set-valeur="$emit('setValeur', j.id, $event)"
               @set-objectif="$emit('setObjectif', j.id, $event)"
+              @select="jaugeSelectionnee = jaugeSelectionnee === j.id ? null : j.id"
             />
             <div :style="{ width: SEP + 'px', flexShrink: 0 }" />
             <BarreVerticale
@@ -56,10 +58,12 @@
               :jauge="j" :etat="etats[j.id]"
               :is-active="etats[j.id].enabled"
               :is-max-reached="jaugesActives.length >= MAX_ACTIVES"
+              :is-selected="jaugeSelectionnee === j.id"
               :col-width="COL" :bar-width="BAR_A" :barre-height="barreHeight"
               @toggle="$emit('toggle', j.id)"
               @set-valeur="$emit('setValeur', j.id, $event)"
               @set-objectif="$emit('setObjectif', j.id, $event)"
+              @select="jaugeSelectionnee = jaugeSelectionnee === j.id ? null : j.id"
             />
           </div>
         </div>
@@ -67,6 +71,16 @@
         <!-- Axe Y droit supprimé -->
 
       </div>
+    </div>
+
+    <!-- Panel paliers -->
+    <div class="px-4 mt-3">
+      <PalierPanel
+        :jauge="jaugeSelectionnee ? jauges.find(j => j.id === jaugeSelectionnee) ?? null : null"
+        :etat="jaugeSelectionnee ? etats[jaugeSelectionnee] : null"
+        @close="jaugeSelectionnee = null"
+        @set-valeur="(id, v) => { $emit('setValeur', id, v) }"
+      />
     </div>
 
     <!-- Séparateur -->
@@ -132,8 +146,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, defineComponent, h } from 'vue'
+import { computed, defineComponent, h, ref } from 'vue'
 import BarreVerticale from '@/components/BarreVerticale.vue'
+import PalierPanel from '@/components/PalierPanel.vue'
 import type { Jauge, JaugeState, JaugeId } from '@/types'
 import { JAUGES_CONFIGS } from '@/composables/jaugesConfig'
 
@@ -210,6 +225,7 @@ defineEmits<{
 }>()
 
 const barreHeight = computed(() => props.barreHeight ?? 260)
+const jaugeSelectionnee = ref<string | null>(null)
 
 const passives = computed(() => props.jauges.filter(j => j.type === 'passive'))
 const actives  = computed(() => props.jauges.filter(j => j.type === 'active'))

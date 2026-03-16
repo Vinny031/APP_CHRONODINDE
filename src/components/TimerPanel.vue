@@ -54,16 +54,23 @@
         <!-- Ligne 2 : input objectif (stop propagation pour ne pas déclencher setTimerSource) -->
         <div class="mb-2" @click.stop>
           <div class="text-white/30 text-[10px] mb-0.5">Objectif stat</div>
-          <input
-            type="number"
-            min="0"
-            :max="getJaugeType(est.jaugeId) === 'passive' ? 5000 : 20000"
-            step="500"
-            :value="etats[est.jaugeId].objectif"
-            @change="e => { const el = e.target as HTMLInputElement; const v = parseInt(el.value, 10); if (!isNaN(v)) { $emit('setObjectif', est.jaugeId, v); el.value = String(etats[est.jaugeId].objectif) } }"
-            class="w-full rounded-md px-1.5 py-1 font-mono text-white text-xs focus:outline-none"
-            :style="{ background: 'rgba(255,255,255,0.09)', border: '1px solid rgba(255,255,255,0.15)' }"
-          />
+          <div class="flex items-center gap-1">
+            <input
+              type="number"
+              min="0"
+              :max="getJaugeType(est.jaugeId) === 'passive' ? 5000 : 20000"
+              step="500"
+              :value="etats[est.jaugeId].objectif"
+              @change="e => { const el = e.target as HTMLInputElement; const v = parseInt(el.value, 10); if (!isNaN(v)) { $emit('setObjectif', est.jaugeId, v); el.value = String(etats[est.jaugeId].objectif) } }"
+              class="flex-1 rounded-md px-1.5 py-1 font-mono text-white text-xs focus:outline-none"
+              :style="{ background: 'rgba(255,255,255,0.09)', border: '1px solid rgba(255,255,255,0.15)' }"
+            />
+            <button
+              class="rounded-md px-1.5 py-1 text-[10px] font-bold text-white/60 hover:text-white transition-colors"
+              :style="{ background: 'rgba(255,255,255,0.09)', border: '1px solid rgba(255,255,255,0.15)' }"
+              @click="$emit('setObjectif', est.jaugeId, getJaugeType(est.jaugeId) === 'passive' ? 5000 : 20000)"
+            >MAX</button>
+          </div>
         </div>
 
         <!-- Ligne 3 : carbu + cycles -->
