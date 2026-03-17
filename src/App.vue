@@ -46,6 +46,7 @@
           :timer-state="timerState"
           :temps-restant="tempsRestant"
           :temps-secondaire-restant="tempsSecondaireRestant"
+          :temps-par-jauge="tempsParJauge"
           :format-temps="formatTemps"
           @set-timer-source="setTimerSource"
           @set-objectif="setObjectif"
@@ -68,19 +69,22 @@ import JaugesDashboard from '@/components/JaugesDashboard.vue'
 import TimerPanel from '@/components/TimerPanel.vue'
 import { useElevageTimer } from '@/composables/useElevageTimer'
 import { JAUGES_DEF } from '@/composables/jaugesConfig'
+import { initialiserNotifications } from '@/composables/useNotification'
 
 const {
   enclos, enclosActifId, selectionnerEnclos,
   jaugesActives, etats, MAX_ACTIVES,
   toggleJauge, setValeurActuelle, setObjectif,
   estimations, tempsTotal, formatTemps,
-  timerSource, timerState, tempsRestant, tempsSecondaireRestant,
+  timerSource, timerState, tempsRestant, tempsSecondaireRestant, tempsParJauge,
   demarrerTimer, pauserTimer, annulerTimer, setTimerSource,
   enclosTimers,
   erreurStockage,
 } = useElevageTimer()
 
 
+
+onMounted(() => { initialiserNotifications() })
 
 const dashCol    = ref<HTMLElement | null>(null)
 const barreHeight = ref(260)

@@ -131,14 +131,13 @@ const props = defineProps<{
   timerState: 'idle' | 'running' | 'paused'
   tempsRestant: number
   tempsSecondaireRestant: number | null
+  tempsParJauge: Partial<Record<JaugeId, number>>
   formatTemps: (s: number) => string
 }>()
 
 function tempsAffiché(jaugeId: JaugeId, fallback: number): number {
   if (props.timerState === 'idle') return fallback
-  // La jauge source = tempsRestant, l'autre = tempsSecondaireRestant
-  if (jaugeId === props.timerSource) return props.tempsRestant
-  return props.tempsSecondaireRestant ?? fallback
+  return props.tempsParJauge[jaugeId] ?? fallback
 }
 
 defineEmits<{

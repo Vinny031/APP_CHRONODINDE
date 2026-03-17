@@ -43,7 +43,7 @@ export function useElevageTimer() {
   annulerTimerRef = timer.annulerTimer
 
   const {
-    timerState, tempsRestant, tempsSecondaireRestant, enclosTimers,
+    timerState, tempsRestant, tempsSecondaireRestant, tempsParJauge, enclosTimers,
     demarrerTimer, pauserTimer, annulerTimer, cleanupAllIntervals,
   } = timer
 
@@ -175,7 +175,7 @@ export function useElevageTimer() {
     toggleJauge, setValeurActuelle, setObjectif,
     estimations, tempsTotal, formatTemps,
     getPourcentage, getPourcentageObjectif, getDeltaActuel,
-    timerState, timerSource, tempsSource, tempsRestant, tempsSecondaireRestant,
+    timerState, timerSource, tempsSource, tempsRestant, tempsSecondaireRestant, tempsParJauge,
     demarrerTimer, pauserTimer, annulerTimer, setTimerSource,
     enclosTimers,
     erreurStockage,
