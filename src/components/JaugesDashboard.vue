@@ -11,7 +11,7 @@
           <span v-for="t in TICKS" :key="t.v"
             class="absolute right-1 font-mono text-right"
             style="font-size: 9px; color: rgba(255,255,255,0.35); white-space: nowrap; transform: translateY(-50%);"
-            :style="{ top: pctTop(t.v) + '%' }"
+            :style="{ top: toPercentageFromTop(t.v) + '%' }"
           >{{ t.l }}</span>
         </div>
 
@@ -22,7 +22,7 @@
           <div class="absolute inset-0 pointer-events-none" style="z-index:1;">
             <div v-for="t in TICKS" :key="t.v"
               class="absolute left-0 right-0"
-              :style="{ top: pctTop(t.v) + '%', height: '1px', background: 'rgba(255,255,255,0.08)' }"
+              :style="{ top: toPercentageFromTop(t.v) + '%', height: '1px', background: 'rgba(255,255,255,0.08)' }"
             />
           </div>
 
@@ -34,37 +34,26 @@
             />
           </div>
 
-          <!-- Barres : positionnées en absolu, alignées en bas, offsetX pour centrage -->
-          <div
-            class="absolute bottom-0 left-0 flex items-end"
-            style="z-index:2;"
-            :style="{ paddingLeft: offsetX + 'px' }"
-          >
-            <BarreVerticale
-              v-for="j in passives" :key="j.id"
-              :jauge="j" :etat="etats[j.id]"
-              :is-active="etats[j.id].enabled"
-              :is-max-reached="jaugesActives.length >= MAX_ACTIVES"
-              :is-selected="jaugeSelectionnee === j.id"
-              :col-width="COL" :bar-width="BAR_P" :barre-height="barreHeight"
-              @toggle="$emit('toggle', j.id)"
-              @set-valeur="$emit('setValeur', j.id, $event)"
-              @set-objectif="$emit('setObjectif', j.id, $event)"
-              @select="jaugeSelectionnee = jaugeSelectionnee === j.id ? null : j.id"
-            />
-            <div :style="{ width: SEP + 'px', flexShrink: 0 }" />
-            <BarreVerticale
-              v-for="j in actives" :key="j.id"
-              :jauge="j" :etat="etats[j.id]"
-              :is-active="etats[j.id].enabled"
-              :is-max-reached="jaugesActives.length >= MAX_ACTIVES"
-              :is-selected="jaugeSelectionnee === j.id"
-              :col-width="COL" :bar-width="BAR_A" :barre-height="barreHeight"
-              @toggle="$emit('toggle', j.id)"
-              @set-valeur="$emit('setValeur', j.id, $event)"
-              @set-objectif="$emit('setObjectif', j.id, $event)"
-              @select="jaugeSelectionnee = jaugeSelectionnee === j.id ? null : j.id"
-            />
+          <!-- Barres : 6 colonnes égales, séparateur après les passives -->
+          <div class="absolute inset-0 flex items-end" style="z-index:2;">
+            <template v-for="(j, i) in jauges" :key="j.id">
+              <!-- Séparateur entre passives (2) et actives (4) -->
+              <div v-if="i === 2" :style="{ width: SEPARATOR_WIDTH + 'px', flexShrink: 0 }" />
+              <div class="flex-1 flex justify-center items-end h-full">
+                <BarreVerticale
+                  :jauge="j" :etat="etats[j.id]"
+                  :is-active="etats[j.id].enabled"
+                  :is-max-reached="jaugesActives.length >= MAX_ACTIVES"
+                  :is-selected="jaugeSelectionnee === j.id"
+                  :col-width="COL"
+                  :bar-width="j.type === 'passive' ? BAR_P : BAR_A"
+                  :barre-height="barreHeight"
+                  @toggle="$emit('toggle', j.id)"
+                  @set-valeur="$emit('setValeur', j.id, $event)"
+                  @set-objectif="$emit('setObjectif', j.id, $event)"
+                />
+              </div>
+            </template>
           </div>
         </div>
 
@@ -73,57 +62,63 @@
       </div>
     </div>
 
-    <!-- Panel paliers -->
-    <div class="px-4 mt-3">
-      <PalierPanel
-        :jauge="jaugeSelectionnee ? jauges.find(j => j.id === jaugeSelectionnee) ?? null : null"
-        :etat="jaugeSelectionnee ? etats[jaugeSelectionnee] : null"
-        @close="jaugeSelectionnee = null"
-        @set-valeur="(id, v) => { $emit('setValeur', id, v) }"
-      />
-    </div>
-
     <!-- Séparateur -->
     <div class="mx-4 mt-3" style="height:1px; background:rgba(255,255,255,0.07);" />
 
-    <!-- Icônes centrées sous les barres — même offsetX que les barres -->
-    <div class="flex py-3 pl-4">
-      <!-- Offset axe G -->
+    <!-- Icônes sous les barres — alignées avec la zone principale -->
+    <div class="flex py-3 px-4">
+      <!-- Offset axe Y gauche -->
       <div style="width: 34px; flex-shrink: 0;" />
 
-      <!-- Groupe icônes aligné sur les barres -->
-      <div class="flex items-center" :style="{ paddingLeft: offsetX + 'px' }">
-
-        <!-- Groupe passifs avec lien visuel en absolute -->
-        <div style="position: relative; display: flex;">
-          <template v-for="j in passives" :key="j.id">
-            <div :style="{ width: COL + 'px', display: 'flex', justifyContent: 'center' }">
-              <IconBtn :cfg="JAUGES_CONFIGS[j.id]"
-                :active="etats[j.id].enabled"
-                :disabled="false"
-                :aria-label="(etats[j.id].enabled ? 'Désactiver' : 'Activer') + ' ' + j.nom"
-                @click="$emit('toggle', j.id)"
-              />
-            </div>
-          </template>
-          <!-- Icône lien centrée entre les deux boutons, en dessous -->
-          <div style="position: absolute; left: 50%; top: 100%; transform: translate(-50%, 4px); pointer-events: none;">
-            <i class="fa-solid fa-link" style="font-size: 12px; color: rgba(192,132,252,0.45);" />
-          </div>
-        </div>
-
-        <div :style="{ width: SEP + 'px', flexShrink: 0 }" />
-
-        <template v-for="j in actives" :key="j.id">
-          <div :style="{ width: COL + 'px', display: 'flex', justifyContent: 'center' }">
+      <!-- Icônes : même structure exacte que les barres (6 flex-1 + séparateur après 2) -->
+      <div class="flex flex-1 items-center" style="position: relative;">
+        <template v-for="(j, i) in jauges" :key="j.id">
+          <div v-if="i === 2" :style="{ width: SEPARATOR_WIDTH + 'px', flexShrink: 0 }" />
+          <div class="flex-1 flex flex-col items-center gap-1" style="position: relative;"
+            @mouseenter="hoveredJauge = j.id"
+            @mouseleave="hoveredJauge = null"
+          >
             <IconBtn :cfg="JAUGES_CONFIGS[j.id]"
               :active="etats[j.id].enabled"
+              :selected="jaugeSelectionnee === j.id"
               :disabled="false"
-              :aria-label="(etats[j.id].enabled ? 'Désactiver' : 'Activer') + ' ' + j.nom"
+              :aria-label="j.nom"
               @click="$emit('toggle', j.id)"
             />
+            <!-- Rouage visible au hover -->
+            <div class="flex justify-center" style="height: 16px; margin-top: 6px;">
+              <button
+                v-show="hoveredJauge === j.id || jaugeSelectionnee === j.id"
+                class="transition-all duration-150"
+                :style="{
+                  fontSize: '11px',
+                  color: jaugeSelectionnee === j.id ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.35)',
+                  background: 'none', border: 'none', cursor: 'pointer', padding: '0',
+                }"
+                @click="jaugeSelectionnee = jaugeSelectionnee === j.id ? null : j.id"
+              >
+                <i class="fa-solid fa-gear" />
+              </button>
+            </div>
+            <!-- Panel paliers ancré sous cette icône -->
+            <div
+              v-if="jaugeSelectionnee === j.id"
+              ref="panelContainerRef"
+              style="position: absolute; top: calc(100% + 4px); left: 50%; transform: translateX(-50%); z-index: 50; width: 340px;"
+            >
+              <PalierPanel
+                :jauge="j"
+                :etat="etats[j.id]"
+                @close="jaugeSelectionnee = null"
+                @set-valeur="(id, v) => { $emit('setValeur', id, v) }"
+              />
+            </div>
           </div>
         </template>
+        <!-- Icône lien entre les 2 passives : centré entre col 0 et col 1 -->
+        <div style="position: absolute; left: calc(100% / 6); top: 100%; transform: translate(-50%, 4px); pointer-events: none;">
+          <i class="fa-solid fa-link" style="font-size: 12px; color: rgba(192,132,252,0.45);" />
+        </div>
       </div>
     </div>
 
@@ -146,19 +141,58 @@
 </template>
 
 <script setup lang="ts">
-import { computed, defineComponent, h, ref } from 'vue'
+import { computed, defineComponent, h, onMounted, onUnmounted, ref } from 'vue'
 import BarreVerticale from '@/components/BarreVerticale.vue'
 import PalierPanel from '@/components/PalierPanel.vue'
 import type { Jauge, JaugeState, JaugeId } from '@/types'
 import { JAUGES_CONFIGS } from '@/composables/jaugesConfig'
 
-// ── Dimensions fixes inspirées du screen original ──────────────────────────
-const BAR_P = 16   // largeur barre passive (px) — fine
-const BAR_A = 16   // largeur barre active (px)  — identique, espacées
-const COL   = 44   // espace alloué par colonne (barre centrée dedans)
-const SEP   = 14   // espace entre groupe passives et groupe actives
-// Les 6 colonnes + 1 séparateur = 6×44 + 14 = 278px de groupe total
-// On centre ce groupe dans la zone disponible via offsetX
+// ── Props ──────────────────────────────────────────────────────────────────
+const props = defineProps<{
+  jauges: Jauge[]
+  etats: Record<JaugeId, JaugeState>
+  jaugesActives: JaugeId[]
+  MAX_ACTIVES: number
+  barreHeight?: number
+  zoneWidth?: number
+}>()
+
+defineEmits<{
+  toggle: [id: JaugeId]
+  setValeur: [id: JaugeId, val: number]
+  setObjectif: [id: JaugeId, val: number]
+}>()
+
+const barreHeight = computed(() => props.barreHeight ?? 260)
+const jaugeSelectionnee = ref<string | null>(null)
+const hoveredJauge = ref<string | null>(null)
+const panelContainerRef = ref<HTMLElement | HTMLElement[] | null>(null)
+
+function onDocumentClick(e: MouseEvent) {
+  if (!jaugeSelectionnee.value) return
+  const el = Array.isArray(panelContainerRef.value) ? panelContainerRef.value[0] : panelContainerRef.value
+  if (el && !el.contains(e.target as Node)) {
+    jaugeSelectionnee.value = null
+  }
+}
+
+onMounted(() => document.addEventListener('mousedown', onDocumentClick))
+onUnmounted(() => document.removeEventListener('mousedown', onDocumentClick))
+
+const passives = computed(() => props.jauges.filter(j => j.type === 'passive'))
+const actives  = computed(() => props.jauges.filter(j => j.type === 'active'))
+
+// ── Dimensions dynamiques selon la zone disponible ─────────────────────────
+const SEPARATOR_WIDTH = 20 // espace entre groupe passives et groupe actives
+
+const COL = computed(() => {
+  const zone = props.zoneWidth ?? 0
+  if (zone <= 0) return 44
+  return Math.floor((zone - SEPARATOR_WIDTH) / 6)
+})
+
+const BAR_P = computed(() => Math.min(28, Math.max(8, Math.floor(COL.value * 0.35))))
+const BAR_A = computed(() => Math.min(28, Math.max(8, Math.floor(COL.value * 0.35))))
 
 // ── Axe Y : ticks sur les seuils réels ────────────────────────────────────
 const TICKS = [
@@ -177,8 +211,8 @@ const PALETTES = [
   { v: 40000,  l: '-10 / +10', color: 'rgba(248,113,113,0.85)' },
 ]
 
-// ── % depuis le haut (top=0 → 100k, top=100 → 0) ─────────────────────────
-function pctTop(v: number) { return (1 - v / 100000) * 100 }
+// % depuis le haut (top=0 → 100k, top=100 → 0)
+function toPercentageFromTop(v: number) { return (1 - v / 100000) * 100 }
 
 // Grille verticale : autant de lignes que de colonnes + 1
 const nbColLines = 7
@@ -206,36 +240,5 @@ const IconBtn = defineComponent({
       onClick: () => !p.disabled && emit('click'),
     }, [h('i', { class: p.cfg!.iconClass, 'aria-hidden': 'true' })])
   },
-})
-
-// ── Props ──────────────────────────────────────────────────────────────────
-const props = defineProps<{
-  jauges: Jauge[]
-  etats: Record<JaugeId, JaugeState>
-  jaugesActives: JaugeId[]
-  MAX_ACTIVES: number
-  barreHeight?: number
-  zoneWidth?: number
-}>()
-
-defineEmits<{
-  toggle: [id: JaugeId]
-  setValeur: [id: JaugeId, val: number]
-  setObjectif: [id: JaugeId, val: number]
-}>()
-
-const barreHeight = computed(() => props.barreHeight ?? 260)
-const jaugeSelectionnee = ref<string | null>(null)
-
-const passives = computed(() => props.jauges.filter(j => j.type === 'passive'))
-const actives  = computed(() => props.jauges.filter(j => j.type === 'active'))
-
-// Largeur du groupe de barres = 6 colonnes + séparateur
-const groupW = 6 * COL + SEP
-
-// Centrage dans la zone disponible
-const offsetX = computed(() => {
-  const zone = props.zoneWidth ?? 0
-  return zone > groupW ? Math.floor((zone - groupW) / 2) : 0
 })
 </script>

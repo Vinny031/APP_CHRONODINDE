@@ -1,6 +1,6 @@
 <template>
   <header class="sticky top-0 z-50 border-b border-white/8" style="background: rgba(15,15,30,0.97); backdrop-filter: blur(16px);">
-    <div class="max-w-5xl mx-auto px-5 py-0 flex items-center gap-4 h-16">
+    <div class="max-w-5xl mx-auto px-5 py-0 flex items-center justify-center gap-4 h-16">
 
       <!-- Logo + nom -->
       <div class="flex items-center gap-3">

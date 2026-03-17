@@ -2,70 +2,56 @@
   <div class="min-h-screen flex flex-col">
     <HeaderApp />
 
-    <TimerBar
-      :enclos-timers="enclosTimers"
-      :format-temps="formatTemps"
-      @demarrer="demarrerTimer"
-      @pauser="pauserTimer"
-      @annuler="annulerTimer"
-    />
+    <!-- Bandeau d'erreur de stockage -->
+    <div
+      v-if="erreurStockage"
+      role="alert"
+      class="px-4 py-2 text-sm text-center"
+      style="background: rgba(233,69,96,0.15); border-bottom: 1px solid rgba(233,69,96,0.4); color: #f87171;"
+    >
+      <i class="fa-solid fa-triangle-exclamation mr-2" />{{ erreurStockage }}
+    </div>
 
-    <main class="flex-1 w-full max-w-5xl mx-auto px-3 py-4 sm:px-4 sm:py-5">
-      <div class="flex flex-col lg:flex-row gap-4 lg:gap-5">
+    <main class="flex-1 w-full px-3 py-4 sm:px-4 sm:py-5">
 
-        <!-- Colonne principale : dashboard -->
-        <div class="flex-1 min-w-0" ref="dashCol">
-          <JaugesDashboard
-            :jauges="JAUGES_DEF"
-            :etats="etats"
-            :jauges-actives="jaugesActives"
-            :MAX_ACTIVES="MAX_ACTIVES"
-:barre-height="barreHeight"
-            :zone-width="zoneWidth"
-            @toggle="toggleJauge"
-            @set-valeur="setValeurActuelle"
-            @set-objectif="setObjectif"
-          />
+      <div class="flex flex-col gap-4" ref="dashCol">
+        <TimerBar
+          :enclos-timers="enclosTimers"
+          :enclos-actif-id="enclosActifId"
+          :format-temps="formatTemps"
+          @demarrer="demarrerTimer"
+          @pauser="pauserTimer"
+          @annuler="annulerTimer"
+          @selectionner="selectionnerEnclos"
+        />
 
-          <!-- Sélecteur d'enclos -->
-          <div class="mt-3 flex items-center gap-2">
-            <img src="/icons/icon_enclos.webp" alt="Enclos" class="w-12 h-12 object-contain opacity-60" />
-            <span class="text-blue-300/60 text-xs font-semibold uppercase tracking-widest mr-1">Enclos</span>
-            <div class="flex items-center gap-1">
-              <button
-                v-for="enc in enclos"
-                :key="enc.id"
-                type="button"
-                class="w-8 h-8 rounded-lg text-sm font-bold transition-all duration-150 border"
-                :class="enc.id === enclosActifId
-                  ? 'bg-blue-500/20 border-blue-400/60 text-blue-300 shadow-[0_0_6px_rgba(96,165,250,0.3)]'
-                  : 'bg-blue-500/10 border-blue-400/20 text-blue-300/40 hover:border-blue-400/40 hover:text-blue-300/70'"
-                @click="selectionnerEnclos(enc.id)"
-              >
-                {{ enc.id }}
-              </button>
-            </div>
-          </div>
+        <JaugesDashboard
+          :jauges="JAUGES_DEF"
+          :etats="etats"
+          :jauges-actives="jaugesActives"
+          :MAX_ACTIVES="MAX_ACTIVES"
+          :barre-height="barreHeight"
+          :zone-width="zoneWidth"
+          @toggle="toggleJauge"
+          @set-valeur="setValeurActuelle"
+          @set-objectif="setObjectif"
+        />
 
-        </div>
-
-        <!-- Panneau timer -->
-        <div class="lg:w-72 xl:w-80 lg:sticky lg:top-20 lg:self-start">
-          <TimerPanel
-            :estimations="estimations"
-            :etats="etats"
-            :temps-total="tempsTotal"
-            :timer-source="timerSource"
-            :timer-state="timerState"
-            :temps-restant="tempsRestant"
-            :temps-secondaire-restant="tempsSecondaireRestant"
-            :format-temps="formatTemps"
-            @set-timer-source="setTimerSource"
-            @set-objectif="setObjectif"
-          />
-        </div>
-
+        <!-- Panneau estimation (pleine largeur, horizontal) -->
+        <TimerPanel
+          :estimations="estimations"
+          :etats="etats"
+          :temps-total="tempsTotal"
+          :timer-source="timerSource"
+          :timer-state="timerState"
+          :temps-restant="tempsRestant"
+          :temps-secondaire-restant="tempsSecondaireRestant"
+          :format-temps="formatTemps"
+          @set-timer-source="setTimerSource"
+          @set-objectif="setObjectif"
+        />
       </div>
+
     </main>
 
     <footer class="text-center py-3 text-xs border-t border-white/5" style="color:rgba(255,255,255,0.18)">
@@ -91,6 +77,7 @@ const {
   timerSource, timerState, tempsRestant, tempsSecondaireRestant,
   demarrerTimer, pauserTimer, annulerTimer, setTimerSource,
   enclosTimers,
+  erreurStockage,
 } = useElevageTimer()
 
 
@@ -105,7 +92,7 @@ const FIXED_W = 34 + 32
 function updateDimensions() {
   const h = window.innerHeight
   barreHeight.value = h < 600 ? 180 : h < 800 ? 220 : 260
-  const colW = dashCol.value?.clientWidth ?? Math.min(window.innerWidth - 24, 640)
+  const colW = dashCol.value?.clientWidth ?? (window.innerWidth - 24)
   zoneWidth.value = Math.max(0, colW - FIXED_W)
 }
 

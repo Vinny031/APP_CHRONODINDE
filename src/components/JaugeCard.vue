@@ -61,11 +61,11 @@
         </div>
       </div>
       <!-- Paliers -->
-      <div class="flex gap-1 mt-2">
+      <div class="flex gap-0.5 mt-2">
         <button
           v-for="palier in PALIERS"
           :key="palier.v"
-          class="flex-1 rounded-lg py-1 text-xs font-bold transition-all duration-150"
+          class="flex-1 rounded-lg py-1 text-xs font-bold transition-all duration-150 min-w-0 px-0"
           :class="etat.valeurActuelle === palier.v
             ? `${config.fillClass} text-white shadow-md`
             : 'bg-white/10 text-white/50 hover:bg-white/20 hover:text-white/80'"
@@ -191,7 +191,8 @@ const emit = defineEmits<{
 const config = computed(() => JAUGES_CONFIGS[props.jauge.id])
 
 const PALIERS = [
-  { v: 20000,  l: '20k'  },
+  { v: 0,      l: 'MIN'  },
+  { v: 2000,   l: '2k'   },
   { v: 40000,  l: '40k'  },
   { v: 70000,  l: '70k'  },
   { v: 90000,  l: '90k'  },
@@ -228,3 +229,56 @@ function onObjectifChange(e: Event) {
   if (!isNaN(v) && v >= 0 && v <= 100000) emit('setObjectif', props.jauge.id, v)
 }
 </script>
+
+<style scoped>
+.jauge-bar {
+  position: relative;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.jauge-bar-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.btn-toggle {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1.5px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  transition: all 0.2s;
+  cursor: pointer;
+  background: transparent;
+  flex-shrink: 0;
+}
+
+.btn-toggle.active {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.btn-toggle.disabled-max {
+  cursor: not-allowed;
+}
+
+.badge-delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: monospace;
+}
+</style>

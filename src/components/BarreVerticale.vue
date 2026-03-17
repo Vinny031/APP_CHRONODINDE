@@ -20,7 +20,7 @@
       <div
         class="absolute bottom-0 left-0 w-full transition-all duration-150"
         :style="{
-          height: pct(etat.valeurActuelle) + '%',
+          height: toPercentage(etat.valeurActuelle) + '%',
           background: config.fillColor,
           opacity: isActive ? 0.9 : 0.5,
           borderRadius: '3px',
@@ -32,7 +32,7 @@
         v-if="isActive && etat.objectif > 0"
         class="absolute left-0 right-0 pointer-events-none"
         :style="{
-          bottom: pct(Math.max(0, etat.valeurActuelle - etat.objectif)) + '%',
+          bottom: toPercentage(Math.max(0, etat.valeurActuelle - etat.objectif)) + '%',
           height: '2px',
           background: 'rgba(255,255,255,0.9)',
           boxShadow: '0 0 5px rgba(255,255,255,0.6)',
@@ -52,9 +52,9 @@
         :aria-valuenow="etat.valeurActuelle"
         @input="e => { emit('setValeur', parseInt((e.target as HTMLInputElement).value, 10)); dragging = true }"
         @change="dragging = false"
-        @mousedown="dragging = true; emit('select')"
+        @mousedown="dragging = true"
         @mouseup="dragging = false"
-        @touchstart="dragging = true; emit('select')"
+        @touchstart="dragging = true"
         @touchend="dragging = false"
         class="absolute inset-0 opacity-0 cursor-pointer"
         style="writing-mode: vertical-lr; direction: rtl; width: 100%; height: 100%; margin: 0; padding: 0; z-index: 4;"
@@ -65,7 +65,7 @@
         v-if="dragging"
         class="absolute left-1/2 pointer-events-none z-10 px-1.5 py-0.5 rounded text-[10px] font-mono text-white whitespace-nowrap"
         :style="{
-          bottom: pct(etat.valeurActuelle) + '%',
+          bottom: toPercentage(etat.valeurActuelle) + '%',
           transform: 'translate(-50%, 50%)',
           background: 'rgba(0,0,0,0.75)',
           border: '1px solid rgba(255,255,255,0.2)',
@@ -104,7 +104,7 @@ const config = computed(() => JAUGES_CONFIGS[props.jauge.id])
 const dragging = ref(false)
 
 // % depuis le bas (0 = vide, 100 = plein)
-function pct(val: number) {
+function toPercentage(val: number) {
   return Math.max(0, Math.min(100, (val / 100000) * 100))
 }
 

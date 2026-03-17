@@ -3,7 +3,7 @@
     <div
       v-if="jauge"
       class="rounded-xl border border-white/10 p-3 mt-2"
-      style="background: rgba(255,255,255,0.05);"
+      style="background: #1a1a2e; box-shadow: 0 8px 32px rgba(0,0,0,0.6);"
     >
       <!-- Header -->
       <div class="flex items-center justify-between mb-2">
@@ -25,14 +25,14 @@
         <div
           class="jauge-bar-fill transition-all duration-300"
           :class="cfg.fillClass"
-          :style="{ width: `${pct}%` }"
+          :style="{ width: `${toPercentage}%` }"
         />
       </div>
 
       <!-- Pills paliers -->
-      <div class="flex gap-1 mb-2">
+      <div class="flex gap-0.5 mb-2">
         <button
-          v-for="p in PALIERS"
+          v-for="p in paliers"
           :key="p.v"
           class="flex-1 rounded-lg py-1.5 text-xs font-bold transition-all duration-150"
           :class="etat.valeurActuelle === p.v
@@ -62,8 +62,17 @@ import { computed } from 'vue'
 import type { Jauge, JaugeState, JaugeId } from '@/types'
 import { JAUGES_CONFIGS } from '@/composables/jaugesConfig'
 
-const PALIERS = [
+const PALIERS_BASE = [
   { v: 0,      l: 'MIN' },
+  { v: 40000,  l: '40k' },
+  { v: 70000,  l: '70k' },
+  { v: 90000,  l: '90k' },
+  { v: 100000, l: 'MAX' },
+]
+
+const PALIERS_PASSIVE = [
+  { v: 0,      l: 'MIN' },
+  { v: 2000,   l: '2k'  },
   { v: 40000,  l: '40k' },
   { v: 70000,  l: '70k' },
   { v: 90000,  l: '90k' },
@@ -81,7 +90,8 @@ const emit = defineEmits<{
 }>()
 
 const cfg = computed(() => props.jauge ? JAUGES_CONFIGS[props.jauge.id] : null)
-const pct = computed(() => props.etat ? Math.round((props.etat.valeurActuelle / 100000) * 100) : 0)
+const paliers = computed(() => props.jauge?.type === 'passive' ? PALIERS_PASSIVE : PALIERS_BASE)
+const toPercentage = computed(() => props.etat ? Math.round((props.etat.valeurActuelle / 100000) * 100) : 0)
 const valeurFormatted = computed(() => props.etat?.valeurActuelle.toLocaleString('fr') ?? '0')
 
 function onExactChange(e: Event) {
@@ -92,6 +102,22 @@ function onExactChange(e: Event) {
 </script>
 
 <style scoped>
+.jauge-bar {
+  position: relative;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.jauge-bar-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  border-radius: 3px;
+}
+
 .palier-slide-enter-active,
 .palier-slide-leave-active {
   transition: all 0.2s ease;
