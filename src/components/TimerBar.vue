@@ -30,6 +30,14 @@
               :class="info.enclosId === enclosActifId ? 'bg-white/20 text-white' : 'bg-white/10 text-white/30'"
             >{{ info.enclosId }}</span>
 
+            <!-- Checkbox suivi titre -->
+            <button
+              class="w-4 h-4 rounded flex items-center justify-center transition-all duration-150 flex-shrink-0"
+              :class="info.enclosId === enclosSuiviId ? 'text-cyan-400' : 'text-white/15 hover:text-white/40'"
+              :title="info.enclosId === enclosSuiviId ? 'Ne plus suivre' : 'Suivre dans le titre'"
+              @click.stop="$emit('setSuivi', info.enclosId === enclosSuiviId ? null : info.enclosId)"
+            ><i class="fa-solid fa-eye text-[8px]" /></button>
+
             <!-- Boutons contrôle (seulement si actif) -->
             <div v-if="info.activeCount > 0" class="flex items-center" @click.stop>
               <button
@@ -55,11 +63,15 @@
           <!-- Timer -->
           <span
             class="font-mono tabular-nums text-xs font-semibold truncate w-full"
-            :class="info.enclosId === enclosActifId ? 'text-white' : 'text-white/25'"
+            :class="info.enclosId === enclosActifId
+              ? (info.timerState !== 'idle' && info.tempsRestant === 0 && info.tempsSecondaire !== null && info.tempsSecondaire > 0 ? 'text-white/25' : 'text-white')
+              : 'text-white/25'"
           >{{ info.activeCount > 0 ? formatTemps(info.timerState !== 'idle' ? info.tempsRestant : info.tempsSource) : '—' }}</span>
-          <span v-if="info.tempsSecondaire !== null" class="font-mono tabular-nums text-[10px] text-white/25 truncate w-full">
-            {{ formatTemps(info.tempsSecondaire) }}
-          </span>
+          <span
+            v-if="info.tempsSecondaire !== null"
+            class="font-mono tabular-nums text-[10px] truncate w-full"
+            :class="info.enclosId === enclosActifId && info.timerState !== 'idle' && info.tempsRestant === 0 && info.tempsSecondaire > 0 ? 'text-white font-semibold' : 'text-white/25'"
+          >{{ formatTemps(info.tempsSecondaire) }}</span>
         </div>
       </div>
 
@@ -72,6 +84,7 @@ import type { EnclosTimerInfo } from '@/composables/useElevageTimer'
 defineProps<{
   enclosTimers: EnclosTimerInfo[]
   enclosActifId: number
+  enclosSuiviId: number | null
   formatTemps: (s: number) => string
 }>()
 
@@ -80,5 +93,6 @@ defineEmits<{
   pauser: [enclosId: number]
   annuler: [enclosId: number]
   selectionner: [enclosId: number]
+  setSuivi: [enclosId: number | null]
 }>()
 </script>

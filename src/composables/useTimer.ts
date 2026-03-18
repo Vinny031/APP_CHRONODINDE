@@ -89,6 +89,10 @@ export function useTimer(enclos: Ref<EnclosState[]>, enclosActifId: Ref<number>)
     runtime.state = 'running'
     runtime.intervalId = setInterval(() => {
       if (runtime.tempsRestant <= 1) {
+        // Forcer objectif à 0 pour toutes les jauges actives (le timer représente le temps exact pour les atteindre)
+        for (const id of enc.jaugesActives) {
+          enc.etats[id].objectif = 0
+        }
         runtime.tempsRestant = 0
         runtime.tempsSecondaireRestant = null
         runtime.tempsParJauge = {}
@@ -154,8 +158,8 @@ export function useTimer(enclos: Ref<EnclosState[]>, enclosActifId: Ref<number>)
       const tempsAffiche = runtime.state !== 'idle' && src
         ? (runtime.tempsParJauge[src] ?? 0)
         : tempsSourcePourEnclos(enc)
-      const tempsSecondaireAffiche = runtime.state !== 'idle' && jaugeSecondaire
-        ? (runtime.tempsParJauge[jaugeSecondaire] ?? null)
+      const tempsSecondaireAffiche = jaugeSecondaire
+        ? (runtime.state !== 'idle' ? (runtime.tempsParJauge[jaugeSecondaire] ?? null) : estimerJaugePourEnclos(enc, jaugeSecondaire).tempsSecondes)
         : null
       return {
         enclosId: enc.id,

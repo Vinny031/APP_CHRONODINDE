@@ -18,11 +18,13 @@
         <TimerBar
           :enclos-timers="enclosTimers"
           :enclos-actif-id="enclosActifId"
+          :enclos-suivi-id="enclosSuiviId"
           :format-temps="formatTemps"
           @demarrer="demarrerTimer"
           @pauser="pauserTimer"
           @annuler="annulerTimer"
           @selectionner="selectionnerEnclos"
+          @set-suivi="enclosSuiviId = $event"
         />
 
         <JaugesDashboard
@@ -62,7 +64,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, watchEffect } from 'vue'
 import HeaderApp from '@/components/HeaderApp.vue'
 import TimerBar from '@/components/TimerBar.vue'
 import JaugesDashboard from '@/components/JaugesDashboard.vue'
@@ -85,6 +87,19 @@ const {
 
 
 onMounted(() => { initialiserNotifications() })
+
+const enclosSuiviId = ref<number | null>(null)
+
+watchEffect(() => {
+  if (enclosSuiviId.value === null) { document.title = 'ChronoDinde'; return }
+  const info = enclosTimers.value.find(e => e.enclosId === enclosSuiviId.value)
+  if (!info || info.activeCount === 0) { document.title = 'ChronoDinde'; return }
+  // Timer actif = secondaire si principal à 0, sinon principal
+  const timerActif = info.timerState !== 'idle' && info.tempsRestant === 0 && info.tempsSecondaire !== null && info.tempsSecondaire > 0
+    ? info.tempsSecondaire
+    : (info.timerState !== 'idle' ? info.tempsRestant : info.tempsSource)
+  document.title = `ChronoDinde — ⏱ ${formatTemps(timerActif)}`
+})
 
 const dashCol    = ref<HTMLElement | null>(null)
 const barreHeight = ref(260)
