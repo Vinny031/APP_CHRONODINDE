@@ -52,11 +52,6 @@
                 @click="$emit('pauser', info.enclosId)"
                 class="w-5 h-5 rounded flex items-center justify-center text-yellow-400 hover:bg-yellow-400/20 transition-all duration-150"
               ><i class="fa-solid fa-pause text-[8px]" /></button>
-              <button
-                v-if="info.timerState !== 'idle'"
-                @click="$emit('annuler', info.enclosId)"
-                class="w-5 h-5 rounded flex items-center justify-center text-white/25 hover:text-white/60 hover:bg-white/10 transition-all duration-150"
-              ><i class="fa-solid fa-stop text-[8px]" /></button>
             </div>
           </div>
 
@@ -91,7 +86,6 @@ defineProps<{
 defineEmits<{
   demarrer: [enclosId: number]
   pauser: [enclosId: number]
-  annuler: [enclosId: number]
   selectionner: [enclosId: number]
   setSuivi: [enclosId: number | null]
 }>()

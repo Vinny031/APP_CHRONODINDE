@@ -4,6 +4,7 @@ import type { JaugeId, EnclosState } from '@/types'
 import { estimerJaugePourEnclos, tempsSourcePourEnclos } from '@/composables/useEstimation'
 import { getDeltaForLevel } from '@/composables/jaugesConfig'
 import { notifierFinTimer, notifierObjectifAtteint } from '@/composables/useNotification'
+import type { PersistedTimerEntry } from '@/composables/useStorage'
 
 // Durée d'un cycle de jeu en secondes.
 const DUREE_CYCLE_SECONDES = 10
@@ -182,10 +183,82 @@ export function useTimer(enclos: Ref<EnclosState[]>, enclosActifId: Ref<number>)
     }
   }
 
+  /**
+   * Restaure un timer après une fermeture de page.
+   * Simule le temps écoulé depuis `savedAt` et reprend (ou termine) le timer.
+   */
+  function restaurerTimer(enclosId: number, entry: PersistedTimerEntry) {
+    const runtime = getRuntime(enclosId)
+    const enc = enclos.value.find(e => e.id === enclosId)
+    if (!enc) return
+
+    // Si le timer était en pause, le temps n'a pas avancé pendant l'absence
+    const elapsed = entry.state === 'paused' ? 0 : Math.floor((Date.now() - entry.savedAt) / 1000)
+    let tempsRestant = entry.tempsRestant - elapsed
+
+    if (tempsRestant <= 0) {
+      // Le timer s'est terminé pendant l'absence — appliquer l'état final
+      for (const id of enc.jaugesActives) {
+        enc.etats[id].objectif = 0
+      }
+      notifierFinTimer(enclosId)
+      return
+    }
+
+    // Simuler les cycles de consommation écoulés
+    const tempsParJauge = { ...entry.tempsParJauge }
+    const tempsSecondaireRestant = entry.tempsSecondaireRestant !== null
+      ? Math.max(0, entry.tempsSecondaireRestant - elapsed)
+      : null
+
+    // Reconstruire l'état des jauges en simulant les ticks manqués
+    // On part des valeurs actuelles de l'enclos et applique les cycles écoulés
+    const ticksAvant = Math.floor(entry.tempsRestant / DUREE_CYCLE_SECONDES)
+    const ticksApres = Math.floor(tempsRestant / DUREE_CYCLE_SECONDES)
+    const cyclesManques = ticksAvant - ticksApres
+
+    if (cyclesManques > 0) {
+      for (let c = 0; c < cyclesManques; c++) {
+        for (const id of enc.jaugesActives) {
+          const etat = enc.etats[id]
+          if (etat.objectif <= 0) continue
+          const delta = getDeltaForLevel(etat.valeurActuelle)
+          if (delta === 0) continue
+          const objectifAvant = etat.objectif
+          const consomme = Math.min(delta, etat.valeurActuelle)
+          etat.valeurActuelle = Math.max(0, etat.valeurActuelle - delta * enc.nbMontures)
+          etat.objectif = Math.max(0, etat.objectif - consomme)
+          if (objectifAvant > 0 && etat.objectif <= 0) notifierObjectifAtteint(enclosId, id)
+        }
+      }
+    }
+
+    // Mettre à jour les tempsParJauge restants
+    for (const id of enc.jaugesActives) {
+      const t = tempsParJauge[id]
+      if (t !== undefined) {
+        tempsParJauge[id] = Math.max(0, t - elapsed)
+      }
+    }
+
+    // Restaurer la timerSource de l'enclos
+    if (entry.timerSource) enc.timerSource = entry.timerSource
+
+    // Restaurer le runtime
+    runtime.tempsRestant = tempsRestant
+    runtime.tempsSecondaireRestant = tempsSecondaireRestant
+    runtime.tempsParJauge = tempsParJauge
+    runtime.snapshot = entry.snapshot
+    // On passe en 'paused' pour que demarrerTimer ne réinitialise pas le runtime
+    runtime.state = 'paused'
+    // Si le timer tournait avant fermeture, on le reprend ; sinon on laisse en pause
+    if (entry.state === 'running') demarrerTimer(enclosId)
+  }
+
   return {
     timersRuntime, getRuntime,
     timerState, tempsRestant, tempsSecondaireRestant, tempsParJauge, enclosTimers,
     demarrerTimer, pauserTimer, annulerTimer, setTimerSource,
-    cleanupAllIntervals,
+    cleanupAllIntervals, restaurerTimer,
   }
 }

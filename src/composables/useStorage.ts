@@ -156,3 +156,44 @@ export async function persistEnclos(enc: EnclosState): Promise<void> {
     throw err
   }
 }
+
+// --- Persistance des timers actifs (pour reprise après fermeture) ---
+
+export interface PersistedTimerEntry {
+  state: 'running' | 'paused'
+  timerSource: JaugeId | null
+  tempsRestant: number
+  tempsSecondaireRestant: number | null
+  tempsParJauge: Partial<Record<JaugeId, number>>
+  snapshot: Partial<Record<JaugeId, { objectif: number; valeurActuelle: number }>>
+  savedAt: number // timestamp ms
+}
+
+// localStorage synchrone — garanti même lors d'une fermeture brutale d'onglet
+const LS_KEY_TIMERS = 'dofus-elevage:timers'
+
+export function persistTimers(timers: Partial<Record<number, PersistedTimerEntry>>): void {
+  try {
+    localStorage.setItem(LS_KEY_TIMERS, JSON.stringify(timers))
+  } catch (err) {
+    console.error('[useStorage] Échec sauvegarde timers :', err)
+  }
+}
+
+export function loadTimers(): Partial<Record<number, PersistedTimerEntry>> | null {
+  try {
+    const raw = localStorage.getItem(LS_KEY_TIMERS)
+    return raw ? JSON.parse(raw) : null
+  } catch (err) {
+    console.error('[useStorage] Échec chargement timers :', err)
+    return null
+  }
+}
+
+export function clearTimers(): void {
+  try {
+    localStorage.removeItem(LS_KEY_TIMERS)
+  } catch (err) {
+    console.error('[useStorage] Échec suppression timers :', err)
+  }
+}

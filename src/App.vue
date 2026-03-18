@@ -22,7 +22,6 @@
           :format-temps="formatTemps"
           @demarrer="demarrerTimer"
           @pauser="pauserTimer"
-          @annuler="annulerTimer"
           @selectionner="selectionnerEnclos"
           @set-suivi="enclosSuiviId = $event"
         />
@@ -79,7 +78,7 @@ const {
   toggleJauge, setValeurActuelle, setObjectif,
   estimations, tempsTotal, formatTemps,
   timerSource, timerState, tempsRestant, tempsSecondaireRestant, tempsParJauge,
-  demarrerTimer, pauserTimer, annulerTimer, setTimerSource,
+  demarrerTimer, pauserTimer, setTimerSource,
   enclosTimers,
   erreurStockage,
 } = useElevageTimer()

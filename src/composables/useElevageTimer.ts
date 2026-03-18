@@ -1,6 +1,7 @@
 import { ref, watch, onUnmounted } from 'vue'
 import type { JaugeId, EnclosState } from '@/types'
-import { loadState, persistEnclos, persistEnclosActifId } from '@/composables/useStorage'
+import { loadState, persistEnclos, persistEnclosActifId, persistTimers, loadTimers, clearTimers } from '@/composables/useStorage'
+import type { PersistedTimerEntry } from '@/composables/useStorage'
 import { getDeltaForLevel } from '@/composables/jaugesConfig'
 import { useEnclosManagement } from '@/composables/useEnclosManagement'
 import { useEstimation } from '@/composables/useEstimation'
@@ -44,12 +45,11 @@ export function useElevageTimer() {
 
   const {
     timerState, tempsRestant, tempsSecondaireRestant, tempsParJauge, enclosTimers,
-    demarrerTimer, pauserTimer, annulerTimer, cleanupAllIntervals,
+    demarrerTimer, pauserTimer, annulerTimer, cleanupAllIntervals, restaurerTimer,
   } = timer
 
-  // Annule le timer si nécessaire, puis met à jour la source sur l'enclos.
+  // Met à jour la source du timer d'un enclos sans toucher à l'état du timer.
   function setTimerSource(source: JaugeId, enclosId: number = enclosActifId.value) {
-    timer.setTimerSource(enclosId)
     const enc = enclos.value.find(e => e.id === enclosId)!
     enc.timerSource = source
     _saveEnclosNow(enc)
@@ -114,7 +114,46 @@ export function useElevageTimer() {
     if (loaded) persistEnclosActifId(id).then(_onStorageSuccess).catch(_onStorageError)
   })
 
+  // --- Persistance des timers actifs (reprise après fermeture) ---
+
+  function _saveRunningTimers() {
+    const snapshot: Partial<Record<number, PersistedTimerEntry>> = {}
+    for (const id of [1, 2, 3, 4, 5, 6]) {
+      const runtime = timer.getRuntime(id)
+      if (runtime.state === 'running' || runtime.state === 'paused') {
+        const enc = enclos.value.find(e => e.id === id)
+        snapshot[id] = {
+          state: runtime.state,
+          timerSource: enc?.timerSource ?? null,
+          tempsRestant: runtime.tempsRestant,
+          tempsSecondaireRestant: runtime.tempsSecondaireRestant,
+          tempsParJauge: { ...runtime.tempsParJauge },
+          snapshot: { ...runtime.snapshot },
+          savedAt: Date.now(),
+        }
+      }
+    }
+    persistTimers(snapshot)
+  }
+
+  // Sauvegarder à chaque fois que la page est cachée (fermeture onglet, navigation, etc.)
+  function _onVisibilityChange() {
+    if (document.visibilityState === 'hidden') {
+      _saveRunningTimers()
+    }
+  }
+
+  // pagehide couvre les cas où visibilitychange ne se déclenche pas (ex: mobile)
+  function _onPageHide() {
+    _saveRunningTimers()
+  }
+
+  document.addEventListener('visibilitychange', _onVisibilityChange)
+  window.addEventListener('pagehide', _onPageHide)
+
   onUnmounted(() => {
+    document.removeEventListener('visibilitychange', _onVisibilityChange)
+    window.removeEventListener('pagehide', _onPageHide)
     // Vider les debounces en attente et écrire immédiatement les enclos modifiés
     for (const [id, handle] of Object.entries(_debounceHandles) as [string, ReturnType<typeof setTimeout>][]) {
       clearTimeout(handle)
@@ -135,6 +174,15 @@ export function useElevageTimer() {
         return persisted ? { ...def, ...persisted, timerSource: null } : def
       })
       enclosActifId.value = saved.enclosActifId ?? saved.enclos[0].id
+    }
+
+    // Restaurer les timers qui tournaient avant la fermeture (localStorage, synchrone)
+    const savedTimers = loadTimers()
+    if (savedTimers) {
+      for (const [idStr, entry] of Object.entries(savedTimers)) {
+        if (entry) restaurerTimer(Number(idStr), entry)
+      }
+      clearTimers()
     }
   }).catch((err) => {
     console.error('[load] erreur', err)
@@ -176,7 +224,7 @@ export function useElevageTimer() {
     estimations, tempsTotal, formatTemps,
     getPourcentage, getPourcentageObjectif, getDeltaActuel,
     timerState, timerSource, tempsSource, tempsRestant, tempsSecondaireRestant, tempsParJauge,
-    demarrerTimer, pauserTimer, annulerTimer, setTimerSource,
+    demarrerTimer, pauserTimer, setTimerSource,
     enclosTimers,
     erreurStockage,
   }
