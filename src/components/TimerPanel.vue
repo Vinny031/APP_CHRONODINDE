@@ -71,6 +71,7 @@
                 :max="getJaugeType(est.jaugeId) === 'passive' ? 5000 : 20000"
                 step="500"
                 :value="etats[est.jaugeId].objectif"
+                @focus="(e) => (e.target as HTMLInputElement).select()"
                 @change="e => { const el = e.target as HTMLInputElement; const v = parseInt(el.value, 10); if (!isNaN(v)) { $emit('setObjectif', est.jaugeId, v); el.value = String(etats[est.jaugeId].objectif) } }"
                 class="flex-1 rounded-md px-1.5 py-1 font-mono text-white text-xs focus:outline-none"
                 :style="{ background: 'rgba(255,255,255,0.09)', border: '1px solid rgba(255,255,255,0.15)' }"
