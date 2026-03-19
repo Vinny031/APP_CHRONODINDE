@@ -151,6 +151,64 @@
   .glow-cyan   { box-shadow: 0 0 16px rgba(34, 211, 238, 0.5); }
   .glow-red    { box-shadow: 0 0 16px rgba(248, 113, 113, 0.5); }
   .glow-orange { box-shadow: 0 0 16px rgba(251, 146, 60, 0.5); }
+
+  /* Auth */
+  .auth-input {
+    @apply w-full rounded-xl px-3 py-2 text-sm text-white bg-white/5 border border-white/10
+           placeholder-white/20 outline-none transition-colors;
+  }
+  .auth-input:focus {
+    border-color: rgba(233, 69, 96, 0.5);
+    background: rgba(255,255,255,0.07);
+  }
+  .auth-input:disabled {
+    @apply opacity-50 cursor-not-allowed;
+  }
+
+  .pw-toggle {
+    @apply absolute right-2.5 top-1/2 -translate-y-1/2 transition-colors outline-none;
+    font-size: 13px;
+    color: rgba(255,255,255,0.25);
+  }
+  .pw-toggle:hover {
+    color: rgba(255,255,255,0.5);
+  }
+  .pw-toggle.active {
+    color: #60a5fa;
+  }
+  .pw-toggle.active:hover {
+    color: #93c5fd;
+  }
+
+  .auth-btn-primary {
+    @apply w-full rounded-xl py-2.5 text-sm font-semibold transition-all;
+    background: rgba(255,255,255,0.10);
+    border: 1px solid rgba(255,255,255,0.60);
+    color: #fff;
+  }
+  .auth-btn-primary:hover:not(:disabled) {
+    background: rgba(255,255,255,0.15);
+  }
+  .auth-btn-primary:disabled {
+    @apply opacity-50 cursor-not-allowed;
+  }
+
+  .auth-btn-danger {
+    @apply w-full rounded-xl py-2.5 text-sm font-semibold text-red-400 border border-red-400/30 transition-all;
+    background: rgba(248, 113, 113, 0.08);
+  }
+  .auth-btn-danger:hover:not(:disabled) {
+    background: rgba(248, 113, 113, 0.15);
+    box-shadow: 0 0 12px rgba(248, 113, 113, 0.2);
+  }
+  .auth-btn-danger:disabled {
+    @apply opacity-50 cursor-not-allowed;
+  }
+
+  .dropdown-item {
+    @apply w-full flex items-center gap-3 px-4 py-2.5 text-sm text-white/70
+           hover:bg-white/5 hover:text-white transition-colors text-left;
+  }
 }
 
 /* Scrollbar custom */

@@ -27,7 +27,7 @@
           <button
             class="absolute -top-2 -right-2 w-4 h-4 rounded-full flex items-center justify-center transition-all duration-150 border"
             :class="info.enclosId === enclosSuiviId
-              ? 'text-cyan-400 bg-[#1a1f35] border-cyan-400/60'
+              ? 'text-[#60a5fa] bg-[#1a1f35] border-[#60a5fa]/60'
               : 'text-white/20 bg-[#1a1f35] border-white/10 hover:text-white/50'"
             :title="info.enclosId === enclosSuiviId ? 'Ne plus suivre' : 'Suivre dans le titre'"
             @click.stop="$emit('setSuivi', info.enclosId === enclosSuiviId ? null : info.enclosId)"

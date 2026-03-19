@@ -60,6 +60,9 @@
       Dofus Élevage Timer · Estimations théoriques
     </footer>
   </div>
+
+  <!-- Modal auth (portée globale via Teleport interne) -->
+  <AuthModal v-if="showAuthModal" />
 </template>
 
 <script setup lang="ts">
@@ -68,9 +71,13 @@ import HeaderApp from '@/components/HeaderApp.vue'
 import TimerBar from '@/components/TimerBar.vue'
 import JaugesDashboard from '@/components/JaugesDashboard.vue'
 import TimerPanel from '@/components/TimerPanel.vue'
+import AuthModal from '@/components/auth/AuthModal.vue'
 import { useElevageTimer } from '@/composables/useElevageTimer'
 import { JAUGES_DEF } from '@/composables/jaugesConfig'
 import { initialiserNotifications } from '@/composables/useNotification'
+import { useAuth } from '@/composables/useAuth'
+
+const { showAuthModal } = useAuth()
 
 const {
   enclos, enclosActifId, selectionnerEnclos,

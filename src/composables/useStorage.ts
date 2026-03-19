@@ -1,12 +1,5 @@
 import type { JaugeId, JaugeState, EnclosState } from '@/types'
-
-const DB_NAME = 'dofus-elevage'
-const DB_VERSION = 3  // v3 : schéma granulaire (une clé par enclos)
-const STORE = 'state'
-
-// Délai maximum d'attente pour l'ouverture d'IndexedDB.
-// Au-delà, on considère que le navigateur bloque l'accès (ex: mode privé strict).
-const DB_OPEN_TIMEOUT_MS = 5_000
+import { openDB, STORE_STATE as STORE } from '@/composables/db'
 
 // Clés de stockage
 const KEY_ENCLOS_ACTIF_ID = 'enclosActifId'
@@ -38,36 +31,6 @@ export function defaultEnclos(id: number): EnclosState {
     etats: defaultEtats(),
     timerSource: null,
   }
-}
-
-let _db: IDBDatabase | null = null
-
-function openDB(): Promise<IDBDatabase> {
-  if (_db) return Promise.resolve(_db)
-
-  const dbPromise = new Promise<IDBDatabase>((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, DB_VERSION)
-    req.onupgradeneeded = (e) => {
-      const db = req.result
-      // Supprimer l'ancien store pour migration v1→v2 ou v2→v3
-      if (db.objectStoreNames.contains(STORE)) {
-        db.deleteObjectStore(STORE)
-      }
-      db.createObjectStore(STORE)
-    }
-    req.onsuccess = () => {
-      _db = req.result
-      // Réinitialiser le cache si la connexion est fermée de l'extérieur
-      _db.onclose = () => { _db = null }
-      resolve(_db)
-    }
-    req.onerror = () => reject(req.error)
-  })
-
-  const timeout = new Promise<never>((_, reject) =>
-    setTimeout(() => reject(new Error('IndexedDB timeout')), DB_OPEN_TIMEOUT_MS)
-  )
-  return Promise.race([dbPromise, timeout])
 }
 
 // Lecture d'une seule clé dans le store
