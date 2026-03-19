@@ -26,15 +26,7 @@
             />
           </div>
 
-          <!-- Grille verticale (colonnes légères) -->
-          <div class="absolute inset-0 pointer-events-none" style="z-index:1;">
-            <div v-for="col in nbColLines" :key="col"
-              class="absolute top-0 bottom-0"
-              :style="{ left: ((col / nbColLines) * 100) + '%', width: '1px', background: 'rgba(255,255,255,0.04)' }"
-            />
-          </div>
-
-          <!-- Barres : 6 colonnes égales, séparateur après les passives -->
+<!-- Barres : 6 colonnes égales, séparateur après les passives -->
           <div class="absolute inset-0 flex items-end" style="z-index:2;">
             <template v-for="(j, i) in jauges" :key="j.id">
               <!-- Séparateur entre passives (2) et actives (4) -->
