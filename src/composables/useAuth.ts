@@ -29,6 +29,27 @@ const showAccountDropdown = ref(false)
 // Validation username
 const USERNAME_RE = /^[a-zA-Z0-9_]{3,20}$/
 
+// Durée de session : 30 jours
+const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000
+
+// Rate limiting côté client : max 5 tentatives par fenêtre de 15 minutes
+const RATE_LIMIT_MAX = 5
+const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000
+const loginAttempts: number[] = []
+
+function checkRateLimit(): void {
+  const now = Date.now()
+  const windowStart = now - RATE_LIMIT_WINDOW_MS
+  const recent = loginAttempts.filter(t => t > windowStart)
+  loginAttempts.length = 0
+  loginAttempts.push(...recent)
+  if (loginAttempts.length >= RATE_LIMIT_MAX) {
+    const retryAfterSec = Math.ceil((loginAttempts[0] + RATE_LIMIT_WINDOW_MS - now) / 1000)
+    throw new Error(`Trop de tentatives. Réessayez dans ${retryAfterSec} secondes.`)
+  }
+  loginAttempts.push(now)
+}
+
 function normalise(username: string): string {
   return username.trim().toLowerCase()
 }
@@ -37,6 +58,10 @@ function normalise(username: string): string {
 function restoreSession() {
   const session = loadSession()
   if (session?.username) {
+    if (session.expiresAt && Date.now() > session.expiresAt) {
+      clearSession()
+      return
+    }
     currentUser.value = { username: session.username, createdAt: session.createdAt }
     isAuthenticated.value = true
   }
@@ -49,6 +74,7 @@ async function register(username: string, password: string): Promise<void> {
   error.value = null
   isLoading.value = true
   try {
+    checkRateLimit()
     const uname = normalise(username)
 
     if (!USERNAME_RE.test(username.trim())) {
@@ -69,7 +95,7 @@ async function register(username: string, password: string): Promise<void> {
     await createUser({
       username: uname,
       passwordHash: pwHash,
-      salt: bufToBase64url(salt),
+      salt: bufToBase64url(salt.buffer as ArrayBuffer),
       encryptedData: ciphertext,
       iv,
       encSalt,
@@ -80,7 +106,7 @@ async function register(username: string, password: string): Promise<void> {
     const user: AuthUser = { username: uname, createdAt: now }
     currentUser.value = user
     isAuthenticated.value = true
-    saveSession({ username: uname, createdAt: now })
+    saveSession({ username: uname, createdAt: now, expiresAt: now + SESSION_TTL_MS })
     showAuthModal.value = false
   } catch (e) {
     error.value = (e as Error).message
@@ -93,6 +119,7 @@ async function login(username: string, password: string): Promise<void> {
   error.value = null
   isLoading.value = true
   try {
+    checkRateLimit()
     const uname = normalise(username)
     const record = await findUser(uname)
 
@@ -100,7 +127,7 @@ async function login(username: string, password: string): Promise<void> {
     const ERR = 'Identifiant ou mot de passe incorrect'
     if (!record) throw new Error(ERR)
 
-    const saltBuf = new Uint8Array(base64urlToBuf(record.salt))
+    const saltBuf = new Uint8Array(base64urlToBuf(record.salt)) as Uint8Array<ArrayBuffer>
     const computedHash = await hashPassword(password, saltBuf)
 
     if (!timingSafeEqual(computedHash, record.passwordHash)) throw new Error(ERR)
@@ -108,7 +135,7 @@ async function login(username: string, password: string): Promise<void> {
     const user: AuthUser = { username: record.username, createdAt: record.createdAt }
     currentUser.value = user
     isAuthenticated.value = true
-    saveSession({ username: record.username, createdAt: record.createdAt })
+    saveSession({ username: record.username, createdAt: record.createdAt, expiresAt: Date.now() + SESSION_TTL_MS })
     showAuthModal.value = false
   } catch (e) {
     error.value = (e as Error).message
@@ -133,7 +160,7 @@ async function changePassword(currentPassword: string, newPassword: string): Pro
     const record = await findUser(uname)
     if (!record) throw new Error('Compte introuvable')
 
-    const saltBuf = new Uint8Array(base64urlToBuf(record.salt))
+    const saltBuf = new Uint8Array(base64urlToBuf(record.salt)) as Uint8Array<ArrayBuffer>
     const computedHash = await hashPassword(currentPassword, saltBuf)
     if (!timingSafeEqual(computedHash, record.passwordHash)) {
       throw new Error('Mot de passe actuel incorrect')
@@ -147,7 +174,7 @@ async function changePassword(currentPassword: string, newPassword: string): Pro
     await updateUser({
       username: uname,
       passwordHash: newHash,
-      salt: bufToBase64url(newSalt),
+      salt: bufToBase64url(newSalt.buffer as ArrayBuffer),
       encryptedData: ciphertext,
       iv,
       encSalt,
@@ -169,7 +196,7 @@ async function deleteAccount(password: string): Promise<void> {
     const record = await findUser(uname)
     if (!record) throw new Error('Compte introuvable')
 
-    const saltBuf = new Uint8Array(base64urlToBuf(record.salt))
+    const saltBuf = new Uint8Array(base64urlToBuf(record.salt)) as Uint8Array<ArrayBuffer>
     const computedHash = await hashPassword(password, saltBuf)
     if (!timingSafeEqual(computedHash, record.passwordHash)) {
       throw new Error('Mot de passe incorrect')

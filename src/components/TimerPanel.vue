@@ -16,14 +16,14 @@
         </div>
         <!-- Temps total (si 2 jauges) — affiché sous le header sur desktop -->
         <div v-if="estimations.length === 2" class="hidden sm:flex items-center gap-2 text-white/60 text-xs mt-2">
-          <i class="fa-solid fa-hourglass-half" />
+          <i class="fa-solid fa-hourglass-half" aria-hidden="true" />
           <span>Temps total :<br>{{ formatTemps(timerState !== 'idle' ? tempsRestant : tempsTotal) }}</span>
         </div>
       </div>
 
       <!-- Aucune jauge active -->
       <div v-if="estimations.length === 0" class="flex-1 text-center py-4 sm:py-2">
-        <i class="fa-solid fa-toggle-off text-4xl text-white/20 mb-3 block" />
+        <i class="fa-solid fa-toggle-off text-4xl text-white/20 mb-3 block" aria-hidden="true" />
         <p class="text-white/40 text-sm">Activez 1 ou 2 jauges<br>pour voir l'estimation</p>
       </div>
 
@@ -57,7 +57,7 @@
               {{ formatTemps(tempsAffiché(est.jaugeId, est.tempsSecondes)) }}
             </span>
             <span v-else class="text-red-400 font-bold text-xs">
-              <i class="fa-solid fa-triangle-exclamation" /> Impossible
+              <i class="fa-solid fa-triangle-exclamation" aria-hidden="true" /> Impossible
             </span>
           </div>
 
@@ -102,7 +102,7 @@
 
           <!-- Message d'erreur -->
           <p v-if="est.message" class="text-red-400 text-[10px] mt-1.5 flex items-center gap-1">
-            <i class="fa-solid fa-circle-info" />
+            <i class="fa-solid fa-circle-info" aria-hidden="true" />
             {{ est.message }}
           </p>
         </button>
@@ -112,7 +112,7 @@
 
     <!-- Temps total mobile (si 2 jauges) -->
     <div v-if="estimations.length === 2" class="sm:hidden flex items-center gap-2 px-1 pt-3 text-white/60 text-xs">
-      <i class="fa-solid fa-hourglass-half" />
+      <i class="fa-solid fa-hourglass-half" aria-hidden="true" />
       <span>Temps total : {{ formatTemps(timerState !== 'idle' ? tempsRestant : tempsTotal) }}</span>
     </div>
   </div>

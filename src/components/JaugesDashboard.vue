@@ -97,7 +97,7 @@
                 }"
                 @click="jaugeSelectionnee = jaugeSelectionnee === j.id ? null : j.id"
               >
-                <i class="fa-solid fa-gear" />
+                <i class="fa-solid fa-gear" aria-hidden="true" />
               </button>
             </div>
             <!-- Panel paliers ancré sous cette icône -->
@@ -117,7 +117,7 @@
         </template>
         <!-- Icône lien entre les 2 passives : centré entre col 0 et col 1 -->
         <div style="position: absolute; left: calc(100% / 6); top: 100%; transform: translate(-50%, 4px); pointer-events: none;">
-          <i class="fa-solid fa-link" style="font-size: 12px; color: rgba(192,132,252,0.45);" />
+          <i class="fa-solid fa-link" style="font-size: 12px; color: rgba(192,132,252,0.45);" aria-hidden="true" />
         </div>
       </div>
     </div>

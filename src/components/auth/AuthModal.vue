@@ -14,7 +14,7 @@
           @click="auth.closeModal()"
           aria-label="Fermer"
         >
-          <i class="fa-solid fa-xmark text-lg" />
+          <i class="fa-solid fa-xmark text-lg" aria-hidden="true" />
         </button>
 
         <!-- Logo + titre -->
@@ -49,7 +49,7 @@
 
         <!-- Note sécurité -->
         <p class="mt-4 text-[10px] text-white/20 text-center leading-relaxed">
-          <i class="fa-solid fa-lock mr-1" />Données chiffrées localement · Aucun envoi réseau
+          <i class="fa-solid fa-lock mr-1" aria-hidden="true" />Données chiffrées localement · Aucun envoi réseau
         </p>
       </div>
     </div>

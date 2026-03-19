@@ -9,7 +9,7 @@
       class="px-4 py-2 text-sm text-center"
       style="background: rgba(233,69,96,0.15); border-bottom: 1px solid rgba(233,69,96,0.4); color: #f87171;"
     >
-      <i class="fa-solid fa-triangle-exclamation mr-2" />{{ erreurStockage }}
+      <i class="fa-solid fa-triangle-exclamation mr-2" aria-hidden="true" />{{ erreurStockage }}
     </div>
 
     <main class="flex-1 w-full px-3 py-4 sm:px-4 sm:py-5">
@@ -121,18 +121,14 @@ function updateDimensions() {
   zoneWidth.value = Math.max(0, colW - FIXED_W)
 }
 
-let resizeTimer: ReturnType<typeof setTimeout> | null = null
-function onResize() {
-  if (resizeTimer !== null) clearTimeout(resizeTimer)
-  resizeTimer = setTimeout(updateDimensions, 150)
-}
+let ro: ResizeObserver | null = null
 
 onMounted(() => {
   updateDimensions()
-  window.addEventListener('resize', onResize)
+  ro = new ResizeObserver(updateDimensions)
+  ro.observe(document.documentElement)
 })
 onUnmounted(() => {
-  window.removeEventListener('resize', onResize)
-  if (resizeTimer !== null) clearTimeout(resizeTimer)
+  ro?.disconnect()
 })
 </script>

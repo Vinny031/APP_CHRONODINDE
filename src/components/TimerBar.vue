@@ -31,7 +31,7 @@
               : 'text-white/20 bg-[#1a1f35] border-white/10 hover:text-white/50'"
             :title="info.enclosId === enclosSuiviId ? 'Ne plus suivre' : 'Suivre dans le titre'"
             @click.stop="$emit('setSuivi', info.enclosId === enclosSuiviId ? null : info.enclosId)"
-          ><i class="fa-solid fa-eye text-[9px]" /></button>
+          ><i class="fa-solid fa-eye text-[9px]" aria-hidden="true" /></button>
 
           <!-- Ligne numéro + bouton -->
           <div class="flex items-center justify-between w-full">
@@ -49,12 +49,12 @@
                   :disabled="info.tempsSource === 0"
                   class="w-5 h-5 rounded flex items-center justify-center transition-all duration-150"
                   :class="info.tempsSource === 0 ? 'opacity-20 cursor-not-allowed text-white/30' : 'text-white/60 hover:bg-white/10'"
-                ><i class="fa-solid fa-play text-[10px]" /></button>
+                ><i class="fa-solid fa-play text-[10px]" aria-hidden="true" /></button>
                 <button
                   v-if="info.timerState === 'running'"
                   @click="$emit('pauser', info.enclosId)"
                   class="w-5 h-5 rounded flex items-center justify-center text-yellow-400 hover:bg-yellow-400/20 transition-all duration-150"
-                ><i class="fa-solid fa-pause text-[10px]" /></button>
+                ><i class="fa-solid fa-pause text-[10px]" aria-hidden="true" /></button>
               </template>
             </div>
           </div>

@@ -81,17 +81,14 @@ export function useElevageTimer() {
       clearTimeout(_debounceHandles[enc.id])
       delete _debounceHandles[enc.id]
     }
-    console.log('[persist] saveNow enclos', enc.id)
     persistEnclos(enc).then(_onStorageSuccess).catch(_onStorageError)
   }
 
   // Sauvegarde différée d'un enclos (debounce pour les mutations fréquentes)
   function _saveEnclosDebounced(enc: EnclosState) {
     if (_debounceHandles[enc.id] !== undefined) clearTimeout(_debounceHandles[enc.id])
-    console.log('[persist] debounce enclos', enc.id)
     _debounceHandles[enc.id] = setTimeout(() => {
       delete _debounceHandles[enc.id]
-      console.log('[persist] write enclos', enc.id, enc)
       persistEnclos(enc).then(_onStorageSuccess).catch(_onStorageError)
     }, DEBOUNCE_ENCLOS_MS)
   }
@@ -103,7 +100,6 @@ export function useElevageTimer() {
     watch(
       () => enclos.value[i],
       (enc) => {
-        console.log('[watch] enclos', i, 'loaded=', loaded)
         if (loaded) _saveEnclosDebounced(enc)
       },
       { deep: true }
@@ -167,7 +163,6 @@ export function useElevageTimer() {
 
   loadState().then(saved => {
     erreurStockage.value = null
-    console.log('[load] saved=', saved)
     if (saved?.enclos && saved.enclos.length > 0) {
       enclos.value = enclos.value.map(def => {
         const persisted = saved.enclos.find(e => e.id === def.id)

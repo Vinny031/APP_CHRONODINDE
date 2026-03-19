@@ -30,7 +30,7 @@
           required
         />
         <button type="button" class="pw-toggle" :class="{ active: showPw }" @click="showPw = !showPw" tabindex="-1">
-          <i :class="showPw ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash'" />
+          <i :class="showPw ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash'" aria-hidden="true" />
         </button>
       </div>
     </div>
@@ -49,21 +49,21 @@
           required
         />
         <button type="button" class="pw-toggle" :class="{ active: showPwConfirm }" @click="showPwConfirm = !showPwConfirm" tabindex="-1">
-          <i :class="showPwConfirm ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash'" />
+          <i :class="showPwConfirm ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash'" aria-hidden="true" />
         </button>
       </div>
     </div>
 
     <div v-if="localError || error" class="text-sm text-red-400 bg-red-400/10 rounded-lg px-3 py-2 border border-red-400/20">
-      <i class="fa-solid fa-circle-exclamation mr-2" />{{ localError || error }}
+      <i class="fa-solid fa-circle-exclamation mr-2" aria-hidden="true" />{{ localError || error }}
     </div>
 
     <button type="submit" class="auth-btn-primary" :disabled="isLoading">
       <span v-if="isLoading">
-        <i class="fa-solid fa-spinner fa-spin mr-2" />Création du compte…
+        <i class="fa-solid fa-spinner fa-spin mr-2" aria-hidden="true" />Création du compte…
       </span>
       <span v-else>
-        <i class="fa-solid fa-user-plus mr-2" />Créer mon compte
+        <i class="fa-solid fa-user-plus mr-2" aria-hidden="true" />Créer mon compte
       </span>
     </button>
 

@@ -12,6 +12,7 @@ export interface AuthUserRecord {
 export interface AuthSession {
   username: string
   createdAt: number
+  expiresAt: number  // timestamp ms — session invalide après cette date
 }
 
 export interface AuthUser {

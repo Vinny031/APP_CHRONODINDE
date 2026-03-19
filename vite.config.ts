@@ -10,4 +10,15 @@ export default defineConfig({
       '@': resolve(__dirname, 'src'),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: (id: string) => {
+          if (id.includes('node_modules/vue') || id.includes('node_modules/vue-router')) {
+            return 'vue'
+          }
+        },
+      },
+    },
+  },
 })

@@ -17,24 +17,24 @@ export function base64urlToBuf(s: string): ArrayBuffer {
   const binary = atob(padded)
   const buf = new Uint8Array(binary.length)
   for (let i = 0; i < binary.length; i++) buf[i] = binary.charCodeAt(i)
-  return buf.buffer
+  return buf.buffer as ArrayBuffer
 }
 
 // --- Génération de nombres aléatoires ---
 
-export function generateSalt(): Uint8Array {
-  return crypto.getRandomValues(new Uint8Array(16))
+export function generateSalt(): Uint8Array<ArrayBuffer> {
+  return crypto.getRandomValues(new Uint8Array(16)) as Uint8Array<ArrayBuffer>
 }
 
-export function generateIV(): Uint8Array {
-  return crypto.getRandomValues(new Uint8Array(12))
+export function generateIV(): Uint8Array<ArrayBuffer> {
+  return crypto.getRandomValues(new Uint8Array(12)) as Uint8Array<ArrayBuffer>
 }
 
 // --- Dérivation de clé PBKDF2 ---
 
 async function deriveRawKey(
   password: string,
-  salt: Uint8Array,
+  salt: Uint8Array<ArrayBuffer>,
   usage: KeyUsage[]
 ): Promise<CryptoKey> {
   const enc = new TextEncoder()
@@ -52,7 +52,7 @@ async function deriveRawKey(
 
 // --- Hash du mot de passe (pour comparaison à la connexion) ---
 
-export async function hashPassword(password: string, salt: Uint8Array): Promise<string> {
+export async function hashPassword(password: string, salt: Uint8Array<ArrayBuffer>): Promise<string> {
   const enc = new TextEncoder()
   const baseKey = await crypto.subtle.importKey(
     'raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']
@@ -83,8 +83,8 @@ export async function encryptJSON(data: unknown, password: string): Promise<{
   )
   return {
     ciphertext: bufToBase64url(cipherBuf),
-    iv: bufToBase64url(iv),
-    encSalt: bufToBase64url(encSalt),
+    iv: bufToBase64url(iv.buffer),
+    encSalt: bufToBase64url(encSalt.buffer),
   }
 }
 
@@ -96,11 +96,11 @@ export async function decryptJSON(
 ): Promise<unknown> {
   const key = await deriveRawKey(
     password,
-    new Uint8Array(base64urlToBuf(encSalt)),
+    new Uint8Array(base64urlToBuf(encSalt)) as Uint8Array<ArrayBuffer>,
     ['decrypt']
   )
   const plainBuf = await crypto.subtle.decrypt(
-    { name: 'AES-GCM', iv: new Uint8Array(base64urlToBuf(iv)) },
+    { name: 'AES-GCM', iv: new Uint8Array(base64urlToBuf(iv)) as Uint8Array<ArrayBuffer> },
     key,
     base64urlToBuf(ciphertext)
   )
@@ -111,8 +111,8 @@ export async function decryptJSON(
 // --- Comparaison en temps constant (prévention timing attacks) ---
 
 export function timingSafeEqual(a: string, b: string): boolean {
-  if (a.length !== b.length) return false
-  let diff = 0
-  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i)
+  const len = Math.max(a.length, b.length)
+  let diff = a.length ^ b.length
+  for (let i = 0; i < len; i++) diff |= (a.charCodeAt(i) || 0) ^ (b.charCodeAt(i) || 0)
   return diff === 0
 }

@@ -8,7 +8,7 @@
       <!-- Header -->
       <div class="flex items-center justify-between mb-2">
         <div class="flex items-center gap-2">
-          <i :class="[cfg.iconClass, cfg.textClass, 'text-sm']" />
+          <i :class="[cfg.iconClass, cfg.textClass, 'text-sm']" aria-hidden="true" />
           <span class="text-sm font-bold" :class="cfg.textClass">{{ jauge.nom }}</span>
           <span class="text-xs font-mono text-white/50">{{ valeurFormatted }}</span>
         </div>
@@ -16,7 +16,7 @@
           class="w-5 h-5 rounded flex items-center justify-center text-white/30 hover:text-white/70 transition-colors"
           @click="$emit('close')"
         >
-          <i class="fa-solid fa-xmark text-xs" />
+          <i class="fa-solid fa-xmark text-xs" aria-hidden="true" />
         </button>
       </div>
 

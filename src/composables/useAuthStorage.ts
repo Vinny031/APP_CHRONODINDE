@@ -65,7 +65,13 @@ export function saveSession(session: AuthSession): void {
 export function loadSession(): AuthSession | null {
   try {
     const raw = localStorage.getItem(LS_SESSION_KEY)
-    return raw ? (JSON.parse(raw) as AuthSession) : null
+    if (!raw) return null
+    const session = JSON.parse(raw) as AuthSession
+    if (session.expiresAt && Date.now() > session.expiresAt) {
+      localStorage.removeItem(LS_SESSION_KEY)
+      return null
+    }
+    return session
   } catch {
     return null
   }

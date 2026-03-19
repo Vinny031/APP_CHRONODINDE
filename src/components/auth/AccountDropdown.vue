@@ -11,7 +11,7 @@
         {{ currentUser?.username }}
       </span>
       <i class="fa-solid fa-chevron-down text-[10px] text-white/30 transition-transform"
-         :class="{ 'rotate-180': showAccountDropdown }" />
+         :class="{ 'rotate-180': showAccountDropdown }" aria-hidden="true" />
     </button>
 
     <!-- Dropdown menu -->
@@ -32,7 +32,7 @@
             class="dropdown-item"
             @click="openChangePassword"
           >
-            <i class="fa-solid fa-key w-4 text-center" />
+            <i class="fa-solid fa-key w-4 text-center" aria-hidden="true" />
             Changer le mot de passe
           </button>
 
@@ -40,7 +40,7 @@
             class="dropdown-item text-red-400 hover:bg-red-400/10"
             @click="openDeleteAccount"
           >
-            <i class="fa-solid fa-trash-can w-4 text-center" />
+            <i class="fa-solid fa-trash-can w-4 text-center" aria-hidden="true" />
             Supprimer le compte
           </button>
         </div>
@@ -50,7 +50,7 @@
             class="dropdown-item"
             @click="auth.logout()"
           >
-            <i class="fa-solid fa-right-from-bracket w-4 text-center" />
+            <i class="fa-solid fa-right-from-bracket w-4 text-center" aria-hidden="true" />
             Se déconnecter
           </button>
         </div>
@@ -68,27 +68,27 @@
     >
       <div class="card-dofus w-full max-w-xs relative">
         <button class="absolute top-3 right-3 text-white/30 hover:text-white/70 transition-colors" @click="showChangePass = false">
-          <i class="fa-solid fa-xmark" />
+          <i class="fa-solid fa-xmark" aria-hidden="true" />
         </button>
-        <h2 class="text-sm font-bold text-white mb-4"><i class="fa-solid fa-key mr-2 text-[#e94560]" />Changer le mot de passe</h2>
+        <h2 class="text-sm font-bold text-white mb-4"><i class="fa-solid fa-key mr-2 text-[#e94560]" aria-hidden="true" />Changer le mot de passe</h2>
         <form @submit.prevent="submitChangePassword" class="flex flex-col gap-3">
           <div class="relative">
             <input v-model="cpCurrent" :type="showCpCurrent ? 'text' : 'password'" placeholder="Mot de passe actuel" class="auth-input pr-9" :disabled="isLoading" required />
-            <button type="button" class="pw-toggle" :class="{ active: showCpCurrent }" @click="showCpCurrent = !showCpCurrent" tabindex="-1"><i :class="showCpCurrent ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash'" /></button>
+            <button type="button" class="pw-toggle" :class="{ active: showCpCurrent }" @click="showCpCurrent = !showCpCurrent" tabindex="-1"><i :class="showCpCurrent ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash'" aria-hidden="true" /></button>
           </div>
           <div class="relative">
             <input v-model="cpNew" :type="showCpNew ? 'text' : 'password'" placeholder="Nouveau mot de passe (8 min)" class="auth-input pr-9" :disabled="isLoading" minlength="8" required />
-            <button type="button" class="pw-toggle" :class="{ active: showCpNew }" @click="showCpNew = !showCpNew" tabindex="-1"><i :class="showCpNew ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash'" /></button>
+            <button type="button" class="pw-toggle" :class="{ active: showCpNew }" @click="showCpNew = !showCpNew" tabindex="-1"><i :class="showCpNew ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash'" aria-hidden="true" /></button>
           </div>
           <div class="relative">
             <input v-model="cpConfirm" :type="showCpConfirm ? 'text' : 'password'" placeholder="Confirmer" class="auth-input pr-9" :disabled="isLoading" required />
-            <button type="button" class="pw-toggle" :class="{ active: showCpConfirm }" @click="showCpConfirm = !showCpConfirm" tabindex="-1"><i :class="showCpConfirm ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash'" /></button>
+            <button type="button" class="pw-toggle" :class="{ active: showCpConfirm }" @click="showCpConfirm = !showCpConfirm" tabindex="-1"><i :class="showCpConfirm ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash'" aria-hidden="true" /></button>
           </div>
           <div v-if="cpError" class="text-sm text-red-400 bg-red-400/10 rounded-lg px-3 py-2">{{ cpError }}</div>
           <div v-if="cpSuccess" class="text-sm text-green-400 bg-green-400/10 rounded-lg px-3 py-2">{{ cpSuccess }}</div>
           <button type="submit" class="auth-btn-primary" :disabled="isLoading">
-            <i class="fa-solid fa-spinner fa-spin mr-2" v-if="isLoading" />
-            <i class="fa-solid fa-check mr-2" v-else />
+            <i class="fa-solid fa-spinner fa-spin mr-2" v-if="isLoading" aria-hidden="true" />
+            <i class="fa-solid fa-check mr-2" v-else aria-hidden="true" />
             Confirmer
           </button>
         </form>
@@ -106,19 +106,19 @@
     >
       <div class="card-dofus w-full max-w-xs relative border-red-400/30">
         <button class="absolute top-3 right-3 text-white/30 hover:text-white/70 transition-colors" @click="showDeleteAcc = false">
-          <i class="fa-solid fa-xmark" />
+          <i class="fa-solid fa-xmark" aria-hidden="true" />
         </button>
-        <h2 class="text-sm font-bold text-red-400 mb-2"><i class="fa-solid fa-triangle-exclamation mr-2" />Supprimer le compte</h2>
+        <h2 class="text-sm font-bold text-red-400 mb-2"><i class="fa-solid fa-triangle-exclamation mr-2" aria-hidden="true" />Supprimer le compte</h2>
         <p class="text-xs text-white/40 mb-4">Cette action est irréversible. Entrez votre mot de passe pour confirmer.</p>
         <form @submit.prevent="submitDeleteAccount" class="flex flex-col gap-3">
           <div class="relative">
             <input v-model="delPassword" :type="showDelPw ? 'text' : 'password'" placeholder="Mot de passe" class="auth-input pr-9 border-red-400/30" :disabled="isLoading" required />
-            <button type="button" class="pw-toggle" :class="{ active: showDelPw }" @click="showDelPw = !showDelPw" tabindex="-1"><i :class="showDelPw ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash'" /></button>
+            <button type="button" class="pw-toggle" :class="{ active: showDelPw }" @click="showDelPw = !showDelPw" tabindex="-1"><i :class="showDelPw ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash'" aria-hidden="true" /></button>
           </div>
           <div v-if="delError" class="text-sm text-red-400 bg-red-400/10 rounded-lg px-3 py-2">{{ delError }}</div>
           <button type="submit" class="auth-btn-danger" :disabled="isLoading">
-            <i class="fa-solid fa-spinner fa-spin mr-2" v-if="isLoading" />
-            <i class="fa-solid fa-trash-can mr-2" v-else />
+            <i class="fa-solid fa-spinner fa-spin mr-2" v-if="isLoading" aria-hidden="true" />
+            <i class="fa-solid fa-trash-can mr-2" v-else aria-hidden="true" />
             Supprimer définitivement
           </button>
         </form>

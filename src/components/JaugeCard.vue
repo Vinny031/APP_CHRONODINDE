@@ -91,7 +91,7 @@
     <div class="flex items-center gap-2 mb-3">
       <span class="text-xs text-white/40">Delta / 10s :</span>
       <span class="badge-delta bg-white/10 text-white/80">
-        <i class="fa-solid fa-bolt text-yellow-400 text-xs" />
+        <i class="fa-solid fa-bolt text-yellow-400 text-xs" aria-hidden="true" />
         ±{{ deltaActuel }}
       </span>
       <span class="text-xs text-white/30">×{{ nbMontures }} montures</span>
