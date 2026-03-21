@@ -52,11 +52,13 @@
           @set-timer-source="setTimerSource"
           @set-objectif="setObjectif"
         />
+
+        <SereniteTimeline />
       </div>
 
     </main>
 
-    <footer class="text-center py-3 text-xs border-t border-white/5" style="color:rgba(255,255,255,0.18)">
+    <footer class="text-center py-3 text-xs border-t border-white/5" style="color:rgba(255,255,255,0.45)">
       Dofus Élevage Timer · Estimations théoriques
     </footer>
   </div>
@@ -66,11 +68,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watchEffect } from 'vue'
+import { ref, onMounted, onUnmounted, watchEffect, defineAsyncComponent } from 'vue'
 import HeaderApp from '@/components/HeaderApp.vue'
 import TimerBar from '@/components/TimerBar.vue'
 import JaugesDashboard from '@/components/JaugesDashboard.vue'
 import TimerPanel from '@/components/TimerPanel.vue'
+const SereniteTimeline = defineAsyncComponent(() => import('@/components/SereniteTimeline.vue'))
 import AuthModal from '@/components/auth/AuthModal.vue'
 import { useElevageTimer } from '@/composables/useElevageTimer'
 import { JAUGES_DEF } from '@/composables/jaugesConfig'

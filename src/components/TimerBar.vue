@@ -4,7 +4,7 @@
     <!-- Header -->
     <div class="flex items-center gap-3 mb-3">
       <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0">
-        <img src="/icons/icon_enclos.webp" alt="Enclos" class="w-12 h-12 object-contain" />
+        <img src="/icons/icon_enclos.webp" alt="Enclos" class="w-12 h-12 object-contain" fetchpriority="high" />
       </div>
       <div>
         <h2 class="font-bold text-lg text-white leading-tight">Enclos</h2>
