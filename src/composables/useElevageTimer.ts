@@ -4,7 +4,7 @@ import { loadState, persistEnclos, persistEnclosActifId, persistTimers, loadTime
 import type { PersistedTimerEntry } from '@/composables/useStorage'
 import { getDeltaForLevel } from '@/composables/jaugesConfig'
 import { useEnclosManagement } from '@/composables/useEnclosManagement'
-import { useEstimation } from '@/composables/useEstimation'
+import { useEstimation, estimerJaugePourEnclos } from '@/composables/useEstimation'
 import { useTimer } from '@/composables/useTimer'
 
 // Valeur maximale du carburant (pour les helpers de pourcentage).
@@ -212,10 +212,23 @@ export function useElevageTimer() {
     return getDeltaForLevel(enclosActif.value.etats[id].valeurActuelle)
   }
 
+  function setObjectifAvecMajTimer(id: JaugeId, val: number) {
+    setObjectif(id, val)
+    const runtime = timer.getRuntime(enclosActifId.value)
+    if (runtime.state === 'paused') {
+      const enc = enclosActif.value
+      const nouvelleEstimation = estimerJaugePourEnclos(enc, id)
+      runtime.tempsParJauge = { ...runtime.tempsParJauge, [id]: nouvelleEstimation.tempsSecondes }
+      // Recalculer tempsRestant = max des jauges actives
+      const tempsMax = Math.max(...enc.jaugesActives.map(jid => runtime.tempsParJauge[jid] ?? 0))
+      runtime.tempsRestant = tempsMax
+    }
+  }
+
   return {
     enclos, enclosActifId, enclosActif, selectionnerEnclos,
     nbMontures, jaugesActives, etats, MAX_ACTIVES,
-    toggleJauge, setValeurActuelle, setObjectif,
+    toggleJauge, setValeurActuelle, setObjectif: setObjectifAvecMajTimer,
     estimations, tempsTotal, formatTemps,
     getPourcentage, getPourcentageObjectif, getDeltaActuel,
     timerState, timerSource, tempsSource, tempsRestant, tempsSecondaireRestant, tempsParJauge,
