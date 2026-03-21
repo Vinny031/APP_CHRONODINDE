@@ -58,7 +58,7 @@
 
     </main>
 
-    <footer class="text-center py-3 text-xs border-t border-white/5" style="color:rgba(255,255,255,0.45)">
+    <footer class="text-center py-3 text-xs border-t border-white/5" style="color:rgba(255,255,255,0.7)">
       Dofus Élevage Timer · Estimations théoriques
     </footer>
   </div>

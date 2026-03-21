@@ -10,7 +10,7 @@
         <div class="relative shrink-0 select-none pr-2" style="width: 34px;">
           <span v-for="t in TICKS" :key="t.v"
             class="absolute right-1 font-mono text-right"
-            style="font-size: 9px; color: rgba(255,255,255,0.35); white-space: nowrap; transform: translateY(-50%);"
+            style="font-size: 9px; color: rgba(255,255,255,0.65); white-space: nowrap; transform: translateY(-50%);"
             :style="{ top: toPercentageFromTop(t.v) + '%' }"
           >{{ t.l }}</span>
         </div>
@@ -84,7 +84,7 @@
                 class="transition-all duration-150"
                 :style="{
                   fontSize: '11px',
-                  color: jaugeSelectionnee === j.id ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.35)',
+                  color: jaugeSelectionnee === j.id ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.65)',
                   background: 'none', border: 'none', cursor: 'pointer', padding: '0',
                 }"
                 @click="jaugeSelectionnee = jaugeSelectionnee === j.id ? null : j.id"
@@ -127,7 +127,7 @@
           }"
         />
       </div>
-      <span style="font-size: 11px; color: rgba(255,255,255,0.4);">{{ jaugesActives.length }}/2 jauges activées</span>
+      <span style="font-size: 11px; color: rgba(255,255,255,0.65);">{{ jaugesActives.length }}/2 jauges activées</span>
     </div>
   </div>
 </template>

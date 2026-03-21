@@ -10,7 +10,7 @@
         </div>
         <div class="flex flex-col leading-none gap-1">
           <span class="font-extrabold text-xl tracking-tight text-white">Chrono<span style="color:#e94560">Dinde</span></span>
-          <span class="text-[10px] text-white/30 tracking-widest uppercase font-medium">Élevage Timer</span>
+          <span class="text-[10px] text-white/60 tracking-widest uppercase font-medium">Élevage Timer</span>
         </div>
       </div>
 

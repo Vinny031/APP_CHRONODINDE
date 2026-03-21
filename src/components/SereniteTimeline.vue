@@ -6,16 +6,16 @@
     <!-- En-tête -->
     <div class="mb-4 flex items-center gap-3">
       <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0">
-        <img src="/icons/icon_tips.webp" class="w-8 h-8 object-contain" />
+        <img src="/icons/icon_tips.webp" class="w-8 h-8 object-contain" alt="Icône conseils" />
       </div>
       <div class="flex-1">
         <h2 class="font-bold text-lg text-white leading-tight">Tips</h2>
-        <p class="text-xs text-white/40">Jauge(s) activable(s) selon la sérénité</p>
+        <p class="text-xs text-white/65">Jauge(s) activable(s) selon la sérénité</p>
       </div>
       <!-- Input sérénité -->
       <div class="flex items-center gap-1">
         <button
-          class="rounded-lg px-2 py-1 text-xs font-bold text-white/50 hover:text-white/80 transition-colors"
+          class="rounded-lg px-2 py-1 text-xs font-bold text-white/70 hover:text-white/90 transition-colors"
           style="background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);"
           @click="cursorValue = AXIS_MIN"
         >MIN</button>
@@ -26,9 +26,10 @@
           @change="e => cursorValue = Math.max(AXIS_MIN, Math.min(AXIS_MAX, parseInt((e.target as HTMLInputElement).value) || 0))"
           class="rounded-lg text-center text-sm font-mono font-bold text-white focus:outline-none"
           style="width: 72px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.15); padding: 4px 4px;"
+          aria-label="Valeur de sérénité"
         />
         <button
-          class="rounded-lg px-2 py-1 text-xs font-bold text-white/50 hover:text-white/80 transition-colors"
+          class="rounded-lg px-2 py-1 text-xs font-bold text-white/70 hover:text-white/90 transition-colors"
           style="background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);"
           @click="cursorValue = AXIS_MAX"
         >MAX</button>

@@ -7,11 +7,11 @@
       <div class="flex sm:flex-col items-center sm:items-start gap-3 sm:gap-2 sm:min-w-[140px] sm:pt-1">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0">
-            <img src="/icons/icon_timer.webp" class="w-8 h-8 object-contain" />
+            <img src="/icons/icon_timer.webp" class="w-8 h-8 object-contain" alt="Icône minuteur" />
           </div>
           <div>
             <h2 class="font-bold text-lg text-white leading-tight">Estimation</h2>
-            <p class="text-xs text-white/40">Basée sur la consommation réelle</p>
+            <p class="text-xs text-white/65">Basée sur la consommation réelle</p>
           </div>
         </div>
         <!-- Temps total (si 2 jauges) — affiché sous le header sur desktop -->
@@ -24,7 +24,7 @@
       <!-- Aucune jauge active -->
       <div v-if="estimations.length === 0" class="flex-1 text-center py-4 sm:py-2">
         <i class="fa-solid fa-toggle-off text-4xl text-white/20 mb-3 block" aria-hidden="true" />
-        <p class="text-white/40 text-sm">Activez 1 ou 2 jauges<br>pour voir l'estimation</p>
+        <p class="text-white/65 text-sm">Activez 1 ou 2 jauges<br>pour voir l'estimation</p>
       </div>
 
       <!-- Cards côte à côte (toujours en row sur desktop) -->

@@ -8,7 +8,7 @@
       </div>
       <div>
         <h2 class="font-bold text-lg text-white leading-tight">Enclos</h2>
-        <p class="text-xs text-white/40">Sélectionnez un enclos</p>
+        <p class="text-xs text-white/65">Sélectionnez un enclos</p>
       </div>
     </div>
 
