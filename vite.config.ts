@@ -11,7 +11,7 @@ export default defineConfig({
     },
   },
   build: {
-    minify: 'esbuild',
+    minify: 'oxc',
     rollupOptions: {
       output: {
         manualChunks: (id: string) => {
